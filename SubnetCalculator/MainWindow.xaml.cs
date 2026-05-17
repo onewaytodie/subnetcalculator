@@ -12,12 +12,13 @@ namespace SubnetCalculator
 		public MainWindow()
 		{
 			InitializeComponent();
+			LoadRecentIP();
 			ResetFields();
 		}
 
 		private void ResetFields()
 		{
-			txtIP.Text = "";
+			cmbIP.Text = "";
 			txtMask.Text = "";
 			txtNetwork.Text = "Адрес сети: ";
 			txtBroadcast.Text = "Широковещательный адрес: ";
@@ -30,6 +31,30 @@ namespace SubnetCalculator
 			txtPrefixValue.Text = "0";
 		}
 
+		private void LoadRecentIP()
+		{
+			var recent = Properties.Settings.Default.RecentIP;
+			if (recent != null)
+			{
+				foreach (string ip in recent)
+				{
+					if (!string.IsNullOrEmpty(ip) && !cmbIP.Items.Contains(ip))
+						cmbIP.Items.Add(ip);
+				}
+			}
+		}
+		private void SaveRecentIP(string ip)
+		{
+			if (string.IsNullOrEmpty(ip)) return;
+			var recent = Properties.Settings.Default.RecentIP ?? new System.Collections.Specialized.StringCollection();
+			if (recent.Contains(ip))
+				recent.Remove(ip);
+			recent.Insert(0, ip);
+			while (recent.Count > 5)
+				recent.RemoveAt(recent.Count - 1);
+			Properties.Settings.Default.RecentIP = recent;
+			Properties.Settings.Default.Save();
+		}
 		private void TxtMask_TextChanged(object sender, TextChangedEventArgs e)
 		{
 			if (string.IsNullOrWhiteSpace(txtMask.Text)) return;
@@ -64,7 +89,11 @@ namespace SubnetCalculator
 		private void BtnCalc_Click(object sender, RoutedEventArgs e)
 		{
 			txtError.Text = "";
-			if (!IPAddress.TryParse(txtIP.Text, out IPAddress ip))
+			string ipText = cmbIP.Text.Trim();
+
+			SaveRecentIP(ipText);
+
+			if (!IPAddress.TryParse(ipText, out IPAddress ip))
 			{
 				txtError.Text = "Неверный IP-адрес (пример: 192.168.1.1)";
 				return;
@@ -179,13 +208,13 @@ namespace SubnetCalculator
 		{
 			txtError.Text = "";
 
-			if (string.IsNullOrWhiteSpace(txtIP.Text))
+			if (string.IsNullOrWhiteSpace(cmbIP.Text))
 			{
 				txtError.Text = "Сначала введите IP-адрес!";
 				return;
 			}
 
-			if (!IPAddress.TryParse(txtIP.Text, out IPAddress ip))
+			if (!IPAddress.TryParse(cmbIP.Text, out IPAddress ip))
 			{
 				txtError.Text = "Неверный IP-адрес (пример: 192.168.1.1)";
 				return;
