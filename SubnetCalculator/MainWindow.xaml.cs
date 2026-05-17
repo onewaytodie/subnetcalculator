@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using System.Windows;
@@ -10,9 +11,15 @@ namespace SubnetCalculator
 	public partial class MainWindow : Window
 	{
 		private HelpWindow currentHelpWindow;
+		private List<string> defaultIP = new List<string>();
 		public MainWindow()
 		{
 			InitializeComponent();
+			foreach (ComboBoxItem item in cmbIP.Items)
+			{
+				if (item?.Content != null)
+					defaultIP.Add(item.Content.ToString());
+			}
 			LoadRecentIP();
 			ResetFields();
 		}
@@ -35,19 +42,22 @@ namespace SubnetCalculator
 		private void LoadRecentIP()
 		{
 			var recent = Properties.Settings.Default.RecentIP;
-			if (recent != null)
+			if (recent == null || recent.Count == 0) return;
+			foreach (string ip in recent)
 			{
-				foreach (string ip in recent)
+				if (string.IsNullOrEmpty(ip)) continue;
+				if (!IsIPInComboBox(ip))
 				{
-					if (!string.IsNullOrEmpty(ip) && !cmbIP.Items.Contains(ip))
-						cmbIP.Items.Add(ip);
+					AddIPToComboBox(ip, isUserAdded: true);
 				}
 			}
 		}
 		private void SaveRecentIP(string ip)
 		{
 			if (string.IsNullOrEmpty(ip)) return;
-			var recent = Properties.Settings.Default.RecentIP ?? new System.Collections.Specialized.StringCollection();
+			var recent = Properties.Settings.Default.RecentIP;
+			if (recent == null)
+				recent = new System.Collections.Specialized.StringCollection();
 			if (recent.Contains(ip))
 				recent.Remove(ip);
 			recent.Insert(0, ip);
@@ -55,6 +65,59 @@ namespace SubnetCalculator
 				recent.RemoveAt(recent.Count - 1);
 			Properties.Settings.Default.RecentIP = recent;
 			Properties.Settings.Default.Save();
+
+			if (!IsIPInComboBox(ip))
+			{
+				AddIPToComboBox(ip, isUserAdded: true);
+			}
+		}
+		private bool IsIPInComboBox(string ip)
+		{
+			foreach (ComboBoxItem item in cmbIP.Items)
+			{
+				if (item.Content.ToString() == ip)
+					return true;
+			}
+			return false;
+		}
+
+		private void AddIPToComboBox(string ip, bool isUserAdded)
+		{
+			if (string.IsNullOrEmpty(ip) || cmbIP == null) return;
+			ComboBoxItem newItem = new ComboBoxItem();
+			newItem.Content = ip;
+			if (isUserAdded)
+			{
+				newItem.Foreground = System.Windows.Media.Brushes.DarkRed;
+				newItem.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(80, 255, 0, 0));
+				newItem.FontWeight = FontWeights.Bold;
+			}
+			cmbIP.Items?.Add(newItem);
+		}
+		private void BtnClearHistory_Click(object sender, RoutedEventArgs e)
+		{
+			Properties.Settings.Default.RecentIP = new System.Collections.Specialized.StringCollection();
+			Properties.Settings.Default.Save();
+
+			// 2. Удаляем из ComboBox все элементы, которых нет в defaultIPs
+			if (cmbIP?.Items != null)
+			{
+				List<ComboBoxItem> toRemove = new List<ComboBoxItem>();
+				foreach (ComboBoxItem item in cmbIP.Items)
+				{
+					if (item?.Content != null && !defaultIP.Contains(item.Content.ToString()))
+					{
+						toRemove.Add(item);
+					}
+				}
+				foreach (var item in toRemove)
+				{
+					cmbIP.Items.Remove(item);
+				}
+			}
+
+			// 3. Очищаем текст поля
+			cmbIP.Text = "";
 		}
 		private void TxtMask_TextChanged(object sender, TextChangedEventArgs e)
 		{
@@ -396,6 +459,56 @@ namespace SubnetCalculator
 				default:
 					return "Выберите тему из списка, чтобы увидеть подробное описание расчёта.";
 			}
+		}
+
+		private void BtnDetailedSolution_Click(object sender, RoutedEventArgs e)
+		{
+			if (!IPAddress.TryParse(cmbIP.Text, out IPAddress ip))
+			{
+				txtError.Text = "Сначала введите корректный IP-адрес и нажмите «Решить».";
+				return;
+			}
+			if (!IPAddress.TryParse(txtMask.Text, out IPAddress maskIp))
+			{
+				txtError.Text = "Сначала введите корректную маску и нажмите «Решить».";
+				return;
+			}
+
+
+			int ipInt = IpToInt(ip);
+			int maskInt = IpToInt(maskIp);
+			if (!IsValidMask(maskInt))
+			{
+				txtError.Text = "Маска невалидна. Исправьте маску.";
+				return;
+			}
+
+			int network = ipInt & maskInt;
+			int broadcast = network | ~maskInt;
+			int firstHost = network + 1;
+			int lastHost = broadcast - 1;
+			int prefix = CountPrefixBits(maskInt);
+
+			string ipBinary = FormatBinary(ipInt);
+			string maskBinary = FormatBinary(maskInt);
+			string networkBinary = FormatBinary(network);
+			string broadcastBinary = FormatBinary(broadcast);
+
+			string networkIp = IntToIp(network);
+			string broadcastIp = IntToIp(broadcast);
+			string firstHostIp = IntToIp(firstHost);
+			string lastHostIp = IntToIp(lastHost);
+
+			DetailedSolutionWindow solutionWindow = new DetailedSolutionWindow(
+				cmbIP.Text, txtMask.Text, prefix,
+				ipBinary, maskBinary,
+				networkBinary, networkIp,
+				broadcastBinary, broadcastIp,
+				firstHostIp, lastHostIp,
+				(prefix < 31) ? (Math.Pow(2, 32 - prefix) - 2).ToString() : (prefix == 31 ? "2" : "1")
+			);
+			solutionWindow.Owner = this;
+			solutionWindow.ShowDialog();
 		}
 	}
 }

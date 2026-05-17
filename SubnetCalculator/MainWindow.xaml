@@ -20,10 +20,11 @@
         <Grid Grid.Row="0" Margin="0,5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="60"/>
-                <ColumnDefinition Width="200"/>
-                <ColumnDefinition Width="120"/>
-                <ColumnDefinition Width="120"/>
-                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="180"/>
+                <ColumnDefinition Width="90"/>
+                <ColumnDefinition Width="90"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="130"/>
             </Grid.ColumnDefinitions>
             <Label Content="Ip-адрес:" VerticalAlignment="Center" Tag="IP" ToolTip="Нажмите для подробной справки"/>
             <ComboBox x:Name="cmbIP" Grid.Column="1" Margin="5" Height="30"
@@ -38,9 +39,10 @@
                 <ComboBoxItem Content="1.1.1.1"/>
                 <ComboBoxItem Content="127.0.0.1"/>
             </ComboBox>
-            <Button  x:Name="btnCalc"       Grid.Column="2" Margin="10"     Height="30"  Content="Решить"     Width="100" Click="BtnCalc_Click"/>
-            <Button  x:Name="btnReset"      Grid.Column="3" Margin="10"     Height="30"  Content="Сброс"      Width="100" Click="BtnReset_Click"/>
-            <Button  x:Name="btnClassify"   Grid.Column="4" Margin="10"     Height="30"  Content="Класс сети" Width="120" Click="BtnClassify_Click"/>
+            <Button  x:Name="btnCalc"           Grid.Column="2" Margin="10"     Height="30"  Content="Решить"           Width="70" Click="BtnCalc_Click"/>
+            <Button  x:Name="btnReset"          Grid.Column="3" Margin="10"     Height="30"  Content="Сброс"            Width="70" Click="BtnReset_Click"/>
+            <Button  x:Name="btnClassify"       Grid.Column="4" Margin="10"     Height="30"  Content="Класс сети"       Width="80" Click="BtnClassify_Click"/>
+            <Button  x:Name="btnClearHistory"   Grid.Column="5" Margin="10"     Height="30"  Content="Очистить историю" Width="110" Click="BtnClearHistory_Click"/>
         </Grid>
 
         <GroupBox Header="Маска подсети" Grid.Row="1" Margin="0,10" Tag="Mask" ToolTip="Нажмите для подробной справки">
@@ -87,7 +89,7 @@
                 </Border>
             </StackPanel>
         </GroupBox>
-        <Button Name="btn_DetailedSolution" Grid.Row="3" Margin="470,0,0,0" Height="25" Width="130" Content="Подробное решение"/>
+        <Button Name="btn_DetailedSolution" Grid.Row="3" Margin="470,0,0,0" Height="25" Width="130" Content="Подробное решение" Click="BtnDetailedSolution_Click"/>
         <GroupBox Header="Двоичное представление" Grid.Row="4" Margin="0,10">
             <StackPanel Margin="10">
                 <TextBlock x:Name="txtIPBinary"     Text="IP в двоичном виде:"    FontFamily="Consolas" Margin="0,3" TextWrapping="Wrap" Tag="BinaryIP"    ToolTip="Нажмите для подробной справки"/>
