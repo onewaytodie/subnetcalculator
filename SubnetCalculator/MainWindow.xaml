@@ -6,14 +6,15 @@
         xmlns:local="clr-namespace:SubnetCalculator"
         mc:Ignorable="d"
         Icon="C:\Users\Danila\source\repos\SubnetCalculator\SubnetCalculator\Icon\network.ico"
-        Title="Subnet Calculator" Height="650" Width="700" WindowStartupLocation="CenterScreen">
+        Title="Subnet Calculator" Height="900" Width="700" WindowStartupLocation="CenterScreen">
     <Grid Margin="15">
         <Grid.RowDefinitions>
             <RowDefinition Height="60"/>
             <RowDefinition Height="190"/>
-            <RowDefinition Height="145"/>
-            <RowDefinition Height="130"/>
-            <RowDefinition Height="80"/>
+            <RowDefinition Height="350"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="150"/>
+            <RowDefinition Height="70"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" Margin="0,5">
@@ -24,7 +25,7 @@
                 <ColumnDefinition Width="120"/>
                 <ColumnDefinition Width="150"/>
             </Grid.ColumnDefinitions>
-            <Label Content="Ip-адрес:" VerticalAlignment="Center"/>
+            <Label Content="Ip-адрес:" VerticalAlignment="Center" Tag="IP" ToolTip="Нажмите для подробной справки"/>
             <ComboBox x:Name="cmbIP" Grid.Column="1" Margin="5" Height="30"
               IsEditable="True" IsTextSearchEnabled="True"
               StaysOpenOnEdit="True"
@@ -42,37 +43,76 @@
             <Button  x:Name="btnClassify"   Grid.Column="4" Margin="10"     Height="30"  Content="Класс сети" Width="120" Click="BtnClassify_Click"/>
         </Grid>
 
-        <GroupBox Header="Маска подсети" Grid.Row="1" Margin="0,10">
-    <StackPanel Margin="10">
-        <Label Content="Десятичный вид:"/>
+        <GroupBox Header="Маска подсети" Grid.Row="1" Margin="0,10" Tag="Mask" ToolTip="Нажмите для подробной справки">
+            <StackPanel Margin="10">
+                <Label Content="Десятичный вид:" Tag="DecimalMask" ToolTip="Нажмите для подробной справки"/>
         <TextBox x:Name="txtMask" Margin="0,5" Height="30" VerticalContentAlignment="Center" TextChanged="TxtMask_TextChanged"/>
 
-        <StackPanel Orientation="Horizontal" Margin="0,5">
-            <Label Content="Префикс:" VerticalAlignment="Center"/>
+            <StackPanel Orientation="Horizontal" Margin="0,5">
+                <Label Content="Префикс:" VerticalAlignment="Center" Tag="Prefix" ToolTip="Нажмите для подробной справки"/>
             <TextBlock x:Name="txtPrefixValue" Text="0" Width="40" TextAlignment="Center" 
                        VerticalAlignment="Center" FontWeight="Bold"/>
-        </StackPanel>
+            </StackPanel>
         
         <Slider x:Name="sliderPrefix" Minimum="0" Maximum="32" TickFrequency="1" IsSnapToTickEnabled="True" 
                 Margin="0,5" ValueChanged="SliderPrefix_ValueChanged"/>
-    </StackPanel>
-</GroupBox>
-
-<GroupBox Header="Результаты" Grid.Row="2" Margin="0,10">
-    <StackPanel Margin="10">
-        <TextBlock x:Name="txtNetwork" Text="Адрес сети: " Margin="0,3"/>
-        <TextBlock x:Name="txtBroadcast" Text="Широковещательный адрес: " Margin="0,3"/>
-        <TextBlock x:Name="txtHostRange" Text="Диапазон узлов: " Margin="0,3"/>
-    </StackPanel>
-</GroupBox>
-
-        <GroupBox Header="Двоичное представление" Grid.Row="3" Margin="0,10">
-            <StackPanel Margin="10">
-                <TextBlock x:Name="txtIPBinary" Text="IP в двоичном виде:" FontFamily="Consolas" Margin="0,3" TextWrapping="Wrap"/>
-                <TextBlock x:Name="txtMaskBinary" Text="Маска в двоичном виде:" FontFamily="Consolas" Margin="0,3" TextWrapping="Wrap"/>
             </StackPanel>
         </GroupBox>
 
-        <TextBlock x:Name="txtError" Grid.Row="4" Foreground="Red" Margin="0,1" TextWrapping="Wrap"/>
+        <GroupBox Header="Результаты" Grid.Row="2" Margin="0,10" Tag="Results" ToolTip="Нажмите для общей справки по результатам">
+            <StackPanel Margin="10">
+
+               
+                <TextBlock x:Name="txtNetwork"   Text="Адрес сети: "                Margin="0,3" Tag="Network"      ToolTip="Нажмите для подробной справки"/>
+                <TextBlock x:Name="txtBroadcast" Text="Широковещательный адрес: "   Margin="0,3" Tag="Broadcast"    ToolTip="Нажмите для подробной справки"/>
+                <TextBlock x:Name="txtHostRange" Text="Диапазон узлов: "            Margin="0,3" Tag="HostRange"    ToolTip="Нажмите для подробной справки"/> 
+
+                <Separator Margin="0,10,0,10"/>
+        
+                <TextBlock Text="Подробнее о расчёте:" FontWeight="Bold" Margin="0,0,0,5"/>
+                <ComboBox x:Name="cmbCalcHelp" SelectedIndex="0" SelectionChanged="CmbCalcHelp_SelectionChanged">
+                    <ComboBoxItem Content="Адрес сети"/>
+                    <ComboBoxItem Content="Широковещательный адрес"/>
+                    <ComboBoxItem Content="Диапазон узлов"/>
+                    <ComboBoxItem Content="IP в двоичном виде"/>
+                    <ComboBoxItem Content="Маска в двоичном виде"/>
+                    <ComboBoxItem Content="Префикс (CIDR)"/>
+                </ComboBox>
+        
+                <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="5" Margin="0,10,0,0" Padding="8" Background="#F9F9F9">
+                    <ScrollViewer MaxHeight="120" VerticalScrollBarVisibility="Auto">
+                        <TextBlock x:Name="txtCalcDescription" TextWrapping="Wrap" FontSize="13" 
+                           Foreground="#333333" LineHeight="1.4"/>
+                    </ScrollViewer>
+                </Border>
+            </StackPanel>
+        </GroupBox>
+        <Button Name="btn_DetailedSolution" Grid.Row="3" Margin="470,0,0,0" Height="25" Width="130" Content="Подробное решение"/>
+        <GroupBox Header="Двоичное представление" Grid.Row="4" Margin="0,10">
+            <StackPanel Margin="10">
+                <TextBlock x:Name="txtIPBinary"     Text="IP в двоичном виде:"    FontFamily="Consolas" Margin="0,3" TextWrapping="Wrap" Tag="BinaryIP"    ToolTip="Нажмите для подробной справки"/>
+                <TextBlock x:Name="txtMaskBinary"   Text="Маска в двоичном виде:" FontFamily="Consolas" Margin="0,3" TextWrapping="Wrap" Tag="BinaryMask"  ToolTip="Нажмите для подробной справки"/>
+            </StackPanel>
+        </GroupBox>
+
+        <TextBlock x:Name="txtError" Grid.Row="5" Foreground="Red" Margin="0,1" TextWrapping="Wrap"/>
     </Grid>
+    
+    <Window.Resources>
+        <Style TargetType="Label">
+            <Setter Property="Cursor" Value="Help"/>
+            <Setter Property="ToolTip" Value="Нажмите для подробной справки"/>
+            <EventSetter Event="MouseLeftButtonUp" Handler="HelpLabel_Click"/>
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="Cursor" Value="Help"/>
+            <Setter Property="ToolTip" Value="Нажмите для подробной справки"/>
+            <EventSetter Event="MouseLeftButtonUp" Handler="HelpLabel_Click"/>
+        </Style>
+        <Style TargetType="GroupBox">
+            <Setter Property="Cursor" Value="Help"/>
+            <Setter Property="ToolTip" Value="Нажмите для подробной справки (заголовок)"/>
+            <EventSetter Event="MouseLeftButtonUp" Handler="HelpLabel_Click"/>
+        </Style>
+    </Window.Resources>
 </Window>
