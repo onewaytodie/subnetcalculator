@@ -5,28 +5,62 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SubnetCalculator"
         mc:Ignorable="d"
+        Icon="C:\Users\Danila\source\repos\SubnetCalculator\SubnetCalculator\Icon\network.ico"
         Title="Subnet Calculator" Height="600" Width="700" WindowStartupLocation="CenterScreen">
     <Grid Margin="15">
         <Grid.RowDefinitions>
-            <RowDefinition Height="100"/>
-            <RowDefinition Height="100"/>
-            <RowDefinition Height="100"/>
-            <RowDefinition Height="100"/>
-            <RowDefinition Height="100"/>
-            <RowDefinition Height="100"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="190"/>
+            <RowDefinition Height="145"/>
+            <RowDefinition Height="130"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" Margin="0,5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="60"/>
-                <ColumnDefinition Width="100"/>
                 <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition Width="150"/>
             </Grid.ColumnDefinitions>
             <Label Content="Ip-адрес:" VerticalAlignment="Center"/>
-            <TextBox x:Name="txtIP"     Grid.Column="1" Margin="5"   Height="30" VerticalContentAlignment="Center"/>
-            <Button  x:Name="btnCalc"   Grid.Column="2" Margin="10"  Height="30"  Content="Решить" Width="100" Click="BtnCalc_Click"/>
+            <TextBox x:Name="txtIP"         Grid.Column="1" Margin="5"      Height="30"  VerticalContentAlignment="Center"/>
+            <Button  x:Name="btnCalc"       Grid.Column="2" Margin="10"     Height="30"  Content="Решить"     Width="100" Click="BtnCalc_Click"/>
+            <Button  x:Name="btnReset"      Grid.Column="3" Margin="10"     Height="30"  Content="Сброс"      Width="100" Click="BtnReset_Click"/>
+            <Button  x:Name="btnClassify"   Grid.Column="4" Margin="10"     Height="30"  Content="Класс сети" Width="120" Click="BtnClassify_Click"/>
         </Grid>
+
+        <GroupBox Header="Маска подсети" Grid.Row="1" Margin="0,10">
+    <StackPanel Margin="10">
+        <Label Content="Десятичный вид:"/>
+        <TextBox x:Name="txtMask" Margin="0,5" Height="30" VerticalContentAlignment="Center" TextChanged="TxtMask_TextChanged"/>
+
+        <StackPanel Orientation="Horizontal" Margin="0,5">
+            <Label Content="Префикс:" VerticalAlignment="Center"/>
+            <TextBlock x:Name="txtPrefixValue" Text="0" Width="40" TextAlignment="Center" 
+                       VerticalAlignment="Center" FontWeight="Bold"/>
+        </StackPanel>
         
-        
+        <Slider x:Name="sliderPrefix" Minimum="0" Maximum="32" TickFrequency="1" IsSnapToTickEnabled="True" 
+                Margin="0,5" ValueChanged="SliderPrefix_ValueChanged"/>
+    </StackPanel>
+</GroupBox>
+
+<GroupBox Header="Результаты" Grid.Row="2" Margin="0,10">
+    <StackPanel Margin="10">
+        <TextBlock x:Name="txtNetwork" Text="Адрес сети: " Margin="0,3"/>
+        <TextBlock x:Name="txtBroadcast" Text="Широковещательный адрес: " Margin="0,3"/>
+        <TextBlock x:Name="txtHostRange" Text="Диапазон узлов: " Margin="0,3"/>
+    </StackPanel>
+</GroupBox>
+
+        <GroupBox Header="Двоичное представление" Grid.Row="4" Margin="0,10">
+            <StackPanel Margin="10">
+                <TextBlock x:Name="txtIPBinary" Text="IP в двоичном виде:" FontFamily="Consolas" Margin="0,3" TextWrapping="Wrap"/>
+                <TextBlock x:Name="txtMaskBinary" Text="Маска в двоичном виде:" FontFamily="Consolas" Margin="0,3" TextWrapping="Wrap"/>
+            </StackPanel>
+        </GroupBox>
+
+        <TextBlock x:Name="txtError" Grid.Row="4" Foreground="Red" Margin="0,1" TextWrapping="Wrap"/>
     </Grid>
 </Window>
