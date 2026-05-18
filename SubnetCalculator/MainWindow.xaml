@@ -9,7 +9,7 @@
         WindowStartupLocation="CenterScreen"
         Icon="C:\Users\Danila\source\repos\SubnetCalculator\SubnetCalculator\Icon\tools.ico">
     <Grid>
-        <!-- Фоновое изображение (растягивается на всё окно, под всеми элементами) -->
+        <!-- Фоновое изображение -->
         <Image Source="Image/smeshariki_MainWindow_Background.png" 
                Stretch="UniformToFill" 
                Panel.ZIndex="-1" />
