@@ -59,7 +59,7 @@
             </Setter>
         </Style>
 
-        <!-- Стиль для кнопок (скруглённые) -->
+        <!-- Стиль для кнопок -->
         <Style TargetType="Button">
             <Setter Property="Background"       Value="{StaticResource AccentBrush}"/>
             <Setter Property="Foreground"       Value="White"/>
@@ -215,7 +215,7 @@
     </Window.Resources>
 
     <Grid Margin="15">
-        <!-- Определение строк: все высоты фиксированные, с запасом -->
+        <!-- Определение строк-->
         <Grid.RowDefinitions>
             <RowDefinition Height="85"/>
             <RowDefinition Height="260"/>
@@ -225,7 +225,7 @@
             <RowDefinition Height="80"/>
         </Grid.RowDefinitions>
 
-        <!-- Строка ввода IP (ширины колонок увеличены) -->
+        <!-- Строка ввода IP -->
         <Grid Grid.Row="0" Margin="0,5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="70"/>

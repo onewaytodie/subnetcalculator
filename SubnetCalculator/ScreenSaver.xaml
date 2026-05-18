@@ -8,11 +8,9 @@
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize">
     <Grid>
-        <!-- Изображение на весь экран -->
         <Image Source="Image/smeshariki.png" 
                Stretch="UniformToFill" 
                StretchDirection="Both"/>
-        <!-- Затемняющий полупрозрачный слой -->
         <Border CornerRadius="10"/>
 
         <!-- Текст и прогресс-бар поверх картинки -->

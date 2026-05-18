@@ -64,7 +64,7 @@
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ScreenSaver\ScreenSaver.xaml.cs">
+    <Compile Include="ScreenSaver.xaml.cs">
       <DependentUpon>ScreenSaver.xaml</DependentUpon>
     </Compile>
     <Compile Include="SubnetCalculator\WindowResult.xaml.cs">
@@ -82,7 +82,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ScreenSaver\ScreenSaver.xaml">
+    <Page Include="ScreenSaver.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -138,6 +138,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Image\smeshariki_Background.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ScreenSaverFolder\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
