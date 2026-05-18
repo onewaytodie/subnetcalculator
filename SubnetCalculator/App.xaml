@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:SubnetCalculator"
              ShutdownMode="OnExplicitShutdown"> <!--Свойство при котором приложение не закрывается автоматически(OnLastWindowClose - по умолчанию установлено), 
-    также удалил строку URLStart, которая задавала старт с мэйнвиндов-->
+    также удалил строку StartupUri, которая задавала старт с мэйнвиндов-->
 
     <Application.Resources>
          

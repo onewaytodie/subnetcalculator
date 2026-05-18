@@ -15,20 +15,21 @@ using System.Windows.Threading;
 
 namespace SubnetCalculator
 {
+	//===============================================================================Окно заставки==============================================================================================//
 	public partial class ScreenSaver : Window
 	{
 		public ScreenSaver()
 		{
 			InitializeComponent();
 
-			var timer = new DispatcherTimer();
-			timer.Interval = TimeSpan.FromSeconds(5);
-			timer.Tick += (s, e) =>
+			var timer = new DispatcherTimer();              //Создаю таймер для автоматического закрытия заставки
+			timer.Interval = TimeSpan.FromSeconds(5);       //Устанавливаю интервал – 5 секунд
+			timer.Tick += (s, e) =>                         //Подписываюсь на событие Tick (срабатывает каждый раз по истечении интервала)
 			{
-				timer.Stop();
-				this.Close();
+				timer.Stop();                               //Останавливаю таймер, чтобы событие не сработало повторно
+				this.Close();                               //Закрываю окно заставки
 			};
-			timer.Start();
+			timer.Start();                                  //Запускаю таймер – отсчёт пошёл
 		}
 	}
 }

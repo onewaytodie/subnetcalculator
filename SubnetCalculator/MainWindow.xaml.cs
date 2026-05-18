@@ -20,17 +20,18 @@ namespace SubnetCalculator
 		{
 			InitializeComponent();
 		}
+		//=========================================================Обработчик кнопки "Калькулятор подсетей"=====================================================================================//
 		private void OpenSubnetCalculator_Click(object sender, RoutedEventArgs e)
 		{
-			var calcWindow = new SubnetCalculatorWindow();
-			calcWindow.Owner = this;
-			calcWindow.ShowDialog();
+			SubnetCalculatorWindow calcWindow = new SubnetCalculatorWindow();	//Создаю новое окно калькулятора подсетей
+			calcWindow.Owner = this;                                            //Устанавливаю владельца – текущее главное окно (чтобы калькулятор был поверх него и модально блокировал)
+			calcWindow.ShowDialog();                                            // Открываем окно модально – пользователь не может вернуться в главное окно, пока не закроет калькулятор
 		}
-
+		//=========================================================Обработчик "кнопок-заглушек" (задел ну будущие домашки)======================================================================//
 		private void ShowPlaceholder_Click(object sender, RoutedEventArgs e)
 		{
 			MessageBox.Show("В разработке.", "Информация",
-							MessageBoxButton.OK, MessageBoxImage.Information);
+							MessageBoxButton.OK, MessageBoxImage.Information);  // Вывожу  сообщение с информацией о том, что проект ещё в разработке
 		}
 	}
 }

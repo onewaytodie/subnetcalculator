@@ -11,26 +11,29 @@ namespace SubnetCalculator
 {
 	public partial class App : Application
 	{
+		//Переопределяю метод OnStartup – он вызывается при запуске приложения ДО отображения главного окна
 		protected override void OnStartup(StartupEventArgs e)
 		{
-			base.OnStartup(e);
+			base.OnStartup(e);								//Вызов базовой реализации
 
-			ScreenSaver screen = new ScreenSaver();
-			screen.Show();
+			ScreenSaver screen = new ScreenSaver();         //Создаю и показываю окно заставки
+			screen.Show();                                  //Показываю заставку (окно появится на экране)
 
-			DispatcherTimer timer = new DispatcherTimer();
-			timer.Interval = TimeSpan.FromSeconds(3);
-			timer.Tick += (s, args) =>
+			//Создаю таймер для автоматического закрытия заставки и открытия главного окна
+			DispatcherTimer timer = new DispatcherTimer();  //Таймер, работающий в потоке UI
+			timer.Interval = TimeSpan.FromSeconds(5);       //время между закрытием заставки и открытием приложухи(должно быть +-одинаковым с временем заставки)
+			timer.Tick += (s, args) =>                      //Подписка на событие "тик" таймера
 			{
-				timer.Stop();
-				screen.Close();     
+				timer.Stop();                               //Останавливаю таймер, чтобы событие не повторялось
+				screen.Close();                             //Закрываю окно заставки
 
-				MainWindow main = new MainWindow();
-				main.Show();
+				MainWindow main = new MainWindow();         //После закрытия заставки создаю и показываю главное окно приложения
+				main.Show();                                //Отображаю главное окно
 
-				main.Closed += (o, ev) => this.Shutdown();
+				main.Closed += (o, ev) => this.Shutdown();  //Подписываюсь на событие закрытия главного окна
+															//Когда пользователь закроет главное окно, вызовется Shutdown() для завершения приложения
 			};
-			timer.Start();
+			timer.Start();                                  //Запускаю таймер – начинается отсчёт 5 секунд
 		}
 	}
 }
