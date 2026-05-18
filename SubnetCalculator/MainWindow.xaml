@@ -5,116 +5,72 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SubnetCalculator"
         mc:Ignorable="d"
-        Icon="C:\Users\Danila\source\repos\SubnetCalculator\SubnetCalculator\Icon\network.ico"
-        Title="Subnet Calculator" Height="900" Width="700" WindowStartupLocation="CenterScreen">
-    <Grid Margin="15">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="60"/>
-            <RowDefinition Height="190"/>
-            <RowDefinition Height="350"/>
-            <RowDefinition Height="40"/>
-            <RowDefinition Height="150"/>
-            <RowDefinition Height="70"/>
-        </Grid.RowDefinitions>
+        Title="IP-Lab" Height="450" Width="600"
+        WindowStartupLocation="CenterScreen"
+        Icon="C:\Users\Danila\source\repos\SubnetCalculator\SubnetCalculator\Icon\tools.ico">
+    <Grid>
+        <!-- Фоновое изображение (растягивается на всё окно, под всеми элементами) -->
+        <Image Source="Image/smeshariki_MainWindow_Background.png" 
+               Stretch="UniformToFill" 
+               Panel.ZIndex="-1" />
 
-        <Grid Grid.Row="0" Margin="0,5">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="60"/>
-                <ColumnDefinition Width="180"/>
-                <ColumnDefinition Width="90"/>
-                <ColumnDefinition Width="90"/>
-                <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="130"/>
-            </Grid.ColumnDefinitions>
-            <Label Content="Ip-адрес:" VerticalAlignment="Center" Tag="IP" ToolTip="Нажмите для подробной справки"/>
-            <ComboBox x:Name="cmbIP" Grid.Column="1" Margin="5" Height="30"
-              IsEditable="True" IsTextSearchEnabled="True"
-              StaysOpenOnEdit="True"
-              VerticalContentAlignment="Center">
-                <ComboBoxItem Content="192.168.1.1"/>
-                <ComboBoxItem Content="192.168.0.1"/>
-                <ComboBoxItem Content="10.0.0.1"/>
-                <ComboBoxItem Content="172.16.0.1"/>
-                <ComboBoxItem Content="8.8.8.8"/>
-                <ComboBoxItem Content="1.1.1.1"/>
-                <ComboBoxItem Content="127.0.0.1"/>
-            </ComboBox>
-            <Button  x:Name="btnCalc"           Grid.Column="2" Margin="10"     Height="30"  Content="Решить"           Width="70" Click="BtnCalc_Click"/>
-            <Button  x:Name="btnReset"          Grid.Column="3" Margin="10"     Height="30"  Content="Сброс"            Width="70" Click="BtnReset_Click"/>
-            <Button  x:Name="btnClassify"       Grid.Column="4" Margin="10"     Height="30"  Content="Класс сети"       Width="80" Click="BtnClassify_Click"/>
-            <Button  x:Name="btnClearHistory"   Grid.Column="5" Margin="10"     Height="30"  Content="Очистить историю" Width="110" Click="BtnClearHistory_Click"/>
+        <!-- Основной контент с отступами -->
+        <Grid Margin="15">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Верхняя панель -->
+            <Border Background="#2C3E50" Padding="10" CornerRadius="5" Grid.Row="0">
+                <TextBlock Text="Сетевые помощники" FontSize="22" Foreground="White"/>
+            </Border>
+
+            <!-- Кнопки -->
+            <WrapPanel Grid.Row="1" Margin="0,20" HorizontalAlignment="Center">
+                <Button Width="150" Height="100" Margin="10" Click="OpenSubnetCalculator_Click">
+                    <StackPanel>
+                        <TextBlock Text="🧮" FontSize="32" TextAlignment="Center"/>
+                        <TextBlock Text="Калькулятор подсетей" TextAlignment="Center" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Button>
+                
+                <Button Width="150" Height="100" Margin="10" Click="ShowPlaceholder_Click">
+                    <StackPanel>
+                        <TextBlock Text="📁" FontSize="32"/>
+                        <TextBlock Text="Проект 2" TextAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                
+                <Button Width="150" Height="100" Margin="10" Click="ShowPlaceholder_Click">
+                    <StackPanel>
+                        <TextBlock Text="📁" FontSize="32"/>
+                        <TextBlock Text="Проект 3" TextAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                
+                <Button Width="150" Height="100" Margin="10" Click="ShowPlaceholder_Click">
+                    <StackPanel>
+                        <TextBlock Text="📁" FontSize="32"/>
+                        <TextBlock Text="Проект 4" TextAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                
+                <Button Width="150" Height="100" Margin="10" Click="ShowPlaceholder_Click">
+                    <StackPanel>
+                        <TextBlock Text="📁" FontSize="32"/>
+                        <TextBlock Text="Проект 5" TextAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Width="150" Height="100" Margin="10" Click="ShowPlaceholder_Click">
+                    <StackPanel>
+                        <TextBlock Text="📁" FontSize="32"/>
+                        <TextBlock Text="Проект 6" TextAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                
+            </WrapPanel>
         </Grid>
-
-        <GroupBox Header="Маска подсети" Grid.Row="1" Margin="0,10" Tag="Mask" ToolTip="Нажмите для подробной справки">
-            <StackPanel Margin="10">
-                <Label Content="Десятичный вид:" Tag="DecimalMask" ToolTip="Нажмите для подробной справки"/>
-        <TextBox x:Name="txtMask" Margin="0,5" Height="30" VerticalContentAlignment="Center" TextChanged="TxtMask_TextChanged"/>
-
-            <StackPanel Orientation="Horizontal" Margin="0,5">
-                <Label Content="Префикс:" VerticalAlignment="Center" Tag="Prefix" ToolTip="Нажмите для подробной справки"/>
-            <TextBlock x:Name="txtPrefixValue" Text="0" Width="40" TextAlignment="Center" 
-                       VerticalAlignment="Center" FontWeight="Bold"/>
-            </StackPanel>
-        
-        <Slider x:Name="sliderPrefix" Minimum="0" Maximum="32" TickFrequency="1" IsSnapToTickEnabled="True" 
-                Margin="0,5" ValueChanged="SliderPrefix_ValueChanged"/>
-            </StackPanel>
-        </GroupBox>
-
-        <GroupBox Header="Результаты" Grid.Row="2" Margin="0,10" Tag="Results" ToolTip="Нажмите для общей справки по результатам">
-            <StackPanel Margin="10">
-
-               
-                <TextBlock x:Name="txtNetwork"   Text="Адрес сети: "                Margin="0,3" Tag="Network"      ToolTip="Нажмите для подробной справки"/>
-                <TextBlock x:Name="txtBroadcast" Text="Широковещательный адрес: "   Margin="0,3" Tag="Broadcast"    ToolTip="Нажмите для подробной справки"/>
-                <TextBlock x:Name="txtHostRange" Text="Диапазон узлов: "            Margin="0,3" Tag="HostRange"    ToolTip="Нажмите для подробной справки"/> 
-
-                <Separator Margin="0,10,0,10"/>
-        
-                <TextBlock Text="Подробнее о расчёте:" FontWeight="Bold" Margin="0,0,0,5"/>
-                <ComboBox x:Name="cmbCalcHelp" SelectedIndex="0" SelectionChanged="CmbCalcHelp_SelectionChanged">
-                    <ComboBoxItem Content="Адрес сети"/>
-                    <ComboBoxItem Content="Широковещательный адрес"/>
-                    <ComboBoxItem Content="Диапазон узлов"/>
-                    <ComboBoxItem Content="IP в двоичном виде"/>
-                    <ComboBoxItem Content="Маска в двоичном виде"/>
-                    <ComboBoxItem Content="Префикс (CIDR)"/>
-                </ComboBox>
-        
-                <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="5" Margin="0,10,0,0" Padding="8" Background="#F9F9F9">
-                    <ScrollViewer MaxHeight="120" VerticalScrollBarVisibility="Auto">
-                        <TextBlock x:Name="txtCalcDescription" TextWrapping="Wrap" FontSize="13" 
-                           Foreground="#333333" LineHeight="1.4"/>
-                    </ScrollViewer>
-                </Border>
-            </StackPanel>
-        </GroupBox>
-        <Button Name="btn_DetailedSolution" Grid.Row="3" Margin="470,0,0,0" Height="25" Width="130" Content="Подробное решение" Click="BtnDetailedSolution_Click"/>
-        <GroupBox Header="Двоичное представление" Grid.Row="4" Margin="0,10">
-            <StackPanel Margin="10">
-                <TextBlock x:Name="txtIPBinary"     Text="IP в двоичном виде:"    FontFamily="Consolas" Margin="0,3" TextWrapping="Wrap" Tag="BinaryIP"    ToolTip="Нажмите для подробной справки"/>
-                <TextBlock x:Name="txtMaskBinary"   Text="Маска в двоичном виде:" FontFamily="Consolas" Margin="0,3" TextWrapping="Wrap" Tag="BinaryMask"  ToolTip="Нажмите для подробной справки"/>
-            </StackPanel>
-        </GroupBox>
-
-        <TextBlock x:Name="txtError" Grid.Row="5" Foreground="Red" Margin="0,1" TextWrapping="Wrap"/>
     </Grid>
-    
-    <Window.Resources>
-        <Style TargetType="Label">
-            <Setter Property="Cursor" Value="Help"/>
-            <Setter Property="ToolTip" Value="Нажмите для подробной справки"/>
-            <EventSetter Event="MouseLeftButtonUp" Handler="HelpLabel_Click"/>
-        </Style>
-        <Style TargetType="TextBlock">
-            <Setter Property="Cursor" Value="Help"/>
-            <Setter Property="ToolTip" Value="Нажмите для подробной справки"/>
-            <EventSetter Event="MouseLeftButtonUp" Handler="HelpLabel_Click"/>
-        </Style>
-        <Style TargetType="GroupBox">
-            <Setter Property="Cursor" Value="Help"/>
-            <Setter Property="ToolTip" Value="Нажмите для подробной справки (заголовок)"/>
-            <EventSetter Event="MouseLeftButtonUp" Handler="HelpLabel_Click"/>
-        </Style>
-    </Window.Resources>
 </Window>

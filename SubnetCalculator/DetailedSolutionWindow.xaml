@@ -7,9 +7,7 @@
     <Grid Margin="15">
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
-            <!-- Заголовок: фиксированная высота -->
             <RowDefinition Height="*"/>
-            <!-- Оставшееся место -->
         </Grid.RowDefinitions>
 
         <TextBlock Text="Пошаговый расчёт подсети" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
@@ -17,7 +15,7 @@
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="0,0,0,10">
 
-                <!-- Блок 1: Исходные данные (всегда виден, не раскрывающийся) -->
+                <!-- Блок 1: Исходные данные -->
                 <Border Background="#F0F0F0" Padding="10" Margin="0,5" CornerRadius="5">
                     <StackPanel>
                         <TextBlock Text="📌 Исходные данные" FontWeight="Bold" FontSize="14"/>
@@ -27,7 +25,7 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Блок 2: Двоичное представление (Expander) -->
+                <!-- Блок 2: Двоичное представление -->
                 <Expander Header="⌨️ 1. Перевод в двоичную систему" Margin="0,5" IsExpanded="False">
                     <Border Background="#FAFAFA" Padding="10" Margin="0,5" CornerRadius="3">
                         <StackPanel>
@@ -41,7 +39,7 @@
                     </Border>
                 </Expander>
 
-                <!-- Блок 3: Адрес сети (Expander) -->
+                <!-- Блок 3: Адрес сети -->
                 <Expander Header="🌐 2. Адрес сети (IP &amp; Маска)" Margin="0,5">
                     <Border Background="#FAFAFA" Padding="10" Margin="0,5" CornerRadius="3">
                         <StackPanel>
@@ -55,7 +53,7 @@
                     </Border>
                 </Expander>
 
-                <!-- Блок 4: Широковещательный адрес (Expander) -->
+                <!-- Блок 4: Широковещательный адрес -->
                 <Expander Header="📢 3. Широковещательный адрес (Сеть | ~Маска)" Margin="0,5">
                     <Border Background="#FAFAFA" Padding="10" Margin="0,5" CornerRadius="3">
                         <StackPanel>
@@ -69,7 +67,7 @@
                     </Border>
                 </Expander>
 
-                <!-- Блок 5: Диапазон узлов (Expander) -->
+                <!-- Блок 5: Диапазон узлов -->
                 <Expander Header="🖥 4. Диапазон доступных узлов" Margin="0,5">
                     <Border Background="#FAFAFA" Padding="10" Margin="0,5" CornerRadius="3">
                         <StackPanel>

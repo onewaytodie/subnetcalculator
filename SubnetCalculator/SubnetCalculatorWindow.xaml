@@ -1,0 +1,313 @@
+﻿<Window x:Class="SubnetCalculator.SubnetCalculatorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SubnetCalculator"
+        mc:Ignorable="d"
+        Icon="C:\Users\Danila\source\repos\SubnetCalculator\SubnetCalculator\Icon\network.ico"
+        Title="Subnet Calculator" Height="1050" Width="815" WindowStartupLocation="CenterScreen" 
+        Background="#F5F7FA">
+    <Window.Resources>
+        <!-- Цвета оформления для фона, карточек, кнопок, рамок и т.д.-->
+        <SolidColorBrush x:Key="BackgroundBrush" Color="#F5F7FA"/>
+        <SolidColorBrush x:Key="CardBackgroundBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="#2C7BE5"/>
+        <SolidColorBrush x:Key="AccentHoverBrush" Color="#1E5EC7"/>
+        <SolidColorBrush x:Key="BorderBrush" Color="#E2E8F0"/>
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#1E293B"/>
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="#64748B"/>
+
+        <!-- Стиль для GroupBox, сделал их белыми и скруглёнными -->
+        <Style TargetType="GroupBox">
+            <Setter Property="Background"       Value="{StaticResource CardBackgroundBrush}"/>    <!-- три строки, отвечающие за внешний вид рамки -->
+            <Setter Property="BorderBrush"      Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness"  Value="1"/>
+            <Setter Property="Margin"           Value="0,10"/>                                      <!-- вертикальный отступ -->
+            <Setter Property="Padding"          Value="0"/>                                         <!-- внутренний -->
+            <Setter Property="FontWeight"       Value="SemiBold"/>                                  <!-- шрифт -->
+            <Setter Property="Foreground"       Value="{StaticResource TextPrimaryBrush}"/>       <!-- цвет текста заголовка --> 
+            <Setter Property="Cursor"           Value="Help"/>                                      <!-- знак вопроса на курсоре -->
+            <Setter Property="ToolTip"          Value="Нажмите для подробной справки (заголовок)"/> <!-- всплывающая подсказка -->
+            <EventSetter Event="MouseLeftButtonUp" Handler="HelpLabel_Click"/>                      <!-- обработчик события -->
+            <Setter Property="Template">                                                            <!-- Создаю свой шаблон -->
+                <Setter.Value>
+                    <ControlTemplate TargetType="GroupBox">                                         <!-- внутренний шаблон создаёт заголовок и область содержимого с отступами -->
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="12"
+                                SnapsToDevicePixels="True">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Border Background="Transparent" Padding="12,8,12,4" CornerRadius="12,12,0,0">
+                                    <ContentPresenter ContentSource="Header"
+                                              TextBlock.FontWeight="Bold"
+                                              TextBlock.Foreground="{StaticResource TextPrimaryBrush}"
+                                              Margin="0,0,0,4"/>
+                                </Border>
+                                <Border Grid.Row="1" Padding="12,8,12,12">
+                                    <ContentPresenter />
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для кнопок (скруглённые) -->
+        <Style TargetType="Button">
+            <Setter Property="Background"       Value="{StaticResource AccentBrush}"/>
+            <Setter Property="Foreground"       Value="White"/>
+            <Setter Property="FontWeight"       Value="SemiBold"/>
+            <Setter Property="BorderThickness"  Value="0"/>
+            <Setter Property="Cursor"           Value="Hand"/>
+            <Setter Property="Height"           Value="32"/>
+            <Setter Property="Padding"          Value="16,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger    Property="IsMouseOver"  Value="True">
+                                <Setter Property="Background"   Value="{StaticResource AccentHoverBrush}"/>
+                            </Trigger>
+                            <Trigger    Property="IsPressed"    Value="True">
+                                <Setter Property="Background"   Value="#134B8E"/>
+                            </Trigger>
+                            <Trigger    Property="IsEnabled"    Value="False">
+                                <Setter Property="Background"   Value="#CBD5E1"/>
+                                <Setter Property="Foreground"   Value="#94A3B8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для TextBox -->
+        <Style TargetType="TextBox">
+            <Setter Property="BorderBrush"      Value="{StaticResource BorderBrush}"/>
+            <Setter Property="Background"       Value="{StaticResource CardBackgroundBrush}"/>
+            <Setter Property="Foreground"       Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="BorderThickness"  Value="1"/>
+            <Setter Property="Padding"          Value="8,6"/>
+            <Setter Property="FontSize"         Value="13"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8"
+                                Background="{TemplateBinding Background}">
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для ComboBox -->
+        <Style TargetType="ComboBox">
+            <Setter Property="BorderBrush"      Value="{StaticResource BorderBrush}"/>
+            <Setter Property="Background"       Value= "{StaticResource CardBackgroundBrush}"/>
+            <Setter Property="Foreground"       Value= "{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="BorderThickness"  Value="1"/>
+            <Setter Property="Padding"          Value="6,4"/>
+            <Setter Property="FontSize"         Value="13"/>
+            <Setter Property="Height"           Value="32"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <Border x:Name="Border"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="8"
+                                    Background="{TemplateBinding Background}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="PART_EditableTextBox"
+                                             Grid.Column="0"
+                                             Background="Transparent"
+                                             BorderThickness="0"
+                                             Padding="{TemplateBinding Padding}"
+                                             Foreground="{TemplateBinding Foreground}"
+                                             FontSize="{TemplateBinding FontSize}"
+                                             IsReadOnly="{TemplateBinding IsReadOnly}"/>
+                                    <ToggleButton x:Name="ToggleButton"
+                                                  Grid.Column="1"
+                                                  Background="Transparent"
+                                                  BorderThickness="0"
+                                                  IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                                  Focusable="False"
+                                                  ClickMode="Press">
+                                        <Path Fill="{TemplateBinding Foreground}"
+                                              Data="M0,0 L4,4 L8,0 Z"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Width="8"
+                                              Height="5"/>
+                                    </ToggleButton>
+                                </Grid>
+                            </Border>
+                            <Popup x:Name="PART_Popup"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   Placement="Bottom"
+                                   AllowsTransparency="True"
+                                   Focusable="False"
+                                   PopupAnimation="Slide">
+                                <Border Background="{StaticResource CardBackgroundBrush}"
+                                        BorderBrush="{StaticResource BorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Margin="0,2,0,0">
+                                    <ScrollViewer>
+                                        <ItemsPresenter />
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для Slider -->
+        <Style TargetType="Slider">
+            <Setter Property="Foreground"   Value="{StaticResource AccentBrush}"/>
+            <Setter Property="Background"   Value="{StaticResource BorderBrush}"/>
+            <Setter Property="Height"       Value="20"/>
+        </Style>
+
+        <!-- Стиль для Label -->
+        <Style TargetType="Label">
+            <Setter Property="Foreground"           Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="FontWeight"           Value="SemiBold"/>
+            <Setter Property="FontSize"             Value="13"/>
+            <Setter Property="VerticalAlignment"    Value="Center"/>
+            <Setter Property="Cursor"               Value="Help"/>
+            <Setter Property="ToolTip"              Value="Нажмите для подробной справки"/>
+            <EventSetter Event="MouseLeftButtonUp"  Handler="HelpLabel_Click"/>
+        </Style>
+
+        <!-- Стиль для TextBlock -->
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground"       Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="FontSize"         Value="13"/>
+            <Setter Property="TextWrapping"     Value="Wrap"/>
+            <Setter Property="Cursor"           Value="Help"/>
+            <Setter Property="ToolTip"          Value="Нажмите для подробной справки"/>
+            <EventSetter Event="MouseLeftButtonUp" Handler="HelpLabel_Click"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="15">
+        <!-- Определение строк: все высоты фиксированные, с запасом -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="85"/>
+            <RowDefinition Height="260"/>
+            <RowDefinition Height="420"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="200"/>
+            <RowDefinition Height="80"/>
+        </Grid.RowDefinitions>
+
+        <!-- Строка ввода IP (ширины колонок увеличены) -->
+        <Grid Grid.Row="0" Margin="0,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="110"/>
+                <ColumnDefinition Width="150"/>
+            </Grid.ColumnDefinitions>
+            <Label Content="Ip-адрес:" VerticalAlignment="Center" Tag="IP"/>
+            <ComboBox x:Name="cmbIP" Grid.Column="1" Margin="5" Height="35"
+                      IsEditable="True" IsTextSearchEnabled="True"
+                      StaysOpenOnEdit="True"
+                      VerticalContentAlignment="Center">
+                <ComboBoxItem Content="192.168.1.1"/>
+                <ComboBoxItem Content="192.168.0.1"/>
+                <ComboBoxItem Content="10.0.0.1"/>
+                <ComboBoxItem Content="172.16.0.1"/>
+                <ComboBoxItem Content="8.8.8.8"/>
+                <ComboBoxItem Content="1.1.1.1"/>
+                <ComboBoxItem Content="127.0.0.1"/>
+            </ComboBox>
+            <Button x:Name="btnCalc"         Grid.Column="2" Margin="10" Content="Решить"           Width="80" Click="BtnCalc_Click"/>
+            <Button x:Name="btnReset"        Grid.Column="3" Margin="10" Content="Сброс"            Width="80" Click="BtnReset_Click"/>
+            <Button x:Name="btnClassify"     Grid.Column="4" Margin="10" Content="Класс сети"       Width="90" Click="BtnClassify_Click"/>
+            <Button x:Name="btnClearHistory" Grid.Column="5" Margin="10" Content="Очистить историю" Width="120" Click="BtnClearHistory_Click"/>
+        </Grid>
+
+        <!-- Маска подсети -->
+        <GroupBox Header="Маска подсети" Grid.Row="1" Margin="0,10" Tag="Mask">
+            <StackPanel Margin="10">
+                <Label Content="Десятичный вид:" Tag="DecimalMask"/>
+                <TextBox x:Name="txtMask" Margin="0,5" Height="40" VerticalContentAlignment="Center" TextChanged="TxtMask_TextChanged"/>
+
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <Label Content="Префикс:" VerticalAlignment="Center" Tag="Prefix"/>
+                    <TextBlock x:Name="txtPrefixValue" Text="0" Width="40" TextAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+                </StackPanel>
+                <Slider x:Name="sliderPrefix" Minimum="0" Maximum="32" TickFrequency="1" IsSnapToTickEnabled="True" 
+                        Margin="0,5" ValueChanged="SliderPrefix_ValueChanged"/>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Результаты -->
+        <GroupBox Header="Результаты" Grid.Row="2" Margin="0,10" Tag="Results">
+            <StackPanel Margin="10">
+                <TextBlock x:Name="txtNetwork"   Text="Адрес сети: "                Margin="0,3" Tag="Network"/>
+                <TextBlock x:Name="txtBroadcast" Text="Широковещательный адрес: "   Margin="0,3" Tag="Broadcast"/>
+                <TextBlock x:Name="txtHostRange" Text="Диапазон узлов: "            Margin="0,3" Tag="HostRange"/>
+
+                <Separator Margin="0,10,0,10"/>
+
+                <TextBlock Text="Подробнее о расчёте:" FontWeight="Bold" Margin="0,0,0,5"/>
+                <ComboBox x:Name="cmbCalcHelp" SelectedIndex="0" SelectionChanged="CmbCalcHelp_SelectionChanged">
+                    <ComboBoxItem Content="Адрес сети"/>
+                    <ComboBoxItem Content="Широковещательный адрес"/>
+                    <ComboBoxItem Content="Диапазон узлов"/>
+                    <ComboBoxItem Content="IP в двоичном виде"/>
+                    <ComboBoxItem Content="Маска в двоичном виде"/>
+                    <ComboBoxItem Content="Префикс (CIDR)"/>
+                </ComboBox>
+
+                <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="8" Margin="0,10,0,0" Padding="8" Background="{StaticResource CardBackgroundBrush}">
+                    <ScrollViewer MaxHeight="140" VerticalScrollBarVisibility="Auto">
+                        <TextBlock x:Name="txtCalcDescription" TextWrapping="Wrap" FontSize="13" Foreground="{StaticResource TextPrimaryBrush}" LineHeight="1.4"/>
+                    </ScrollViewer>
+                </Border>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Кнопка подробного решения -->
+        <Button Name="btn_DetailedSolution" Grid.Row="3" Margin="550,0,0,0" Height="35" Width="160" Content="Подробное решение" Click="BtnDetailedSolution_Click"/>
+
+        <!-- Двоичное представление -->
+        <GroupBox Header="Двоичное представление" Grid.Row="4" Margin="0,10">
+            <StackPanel Margin="10">
+                <TextBlock x:Name="txtIPBinary"   Text="IP в двоичном виде:"    FontFamily="Consolas" Margin="0,3" TextWrapping="Wrap" Tag="BinaryIP"/>
+                <TextBlock x:Name="txtMaskBinary" Text="Маска в двоичном виде:" FontFamily="Consolas" Margin="0,3" TextWrapping="Wrap" Tag="BinaryMask"/>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Область ошибок -->
+        <TextBlock x:Name="txtError" Grid.Row="5" Foreground="#E53E3E" Margin="0,1" TextWrapping="Wrap"/>
+    </Grid>
+</Window>
