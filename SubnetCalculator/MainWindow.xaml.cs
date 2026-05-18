@@ -19,6 +19,7 @@ namespace SubnetCalculator
 		public MainWindow()
 		{
 			InitializeComponent();
+			this.Closing += MainWindow_Closing;
 		}
 		//=========================================================Обработчик кнопки "Калькулятор подсетей"=====================================================================================//
 		private void OpenSubnetCalculator_Click(object sender, RoutedEventArgs e)
@@ -32,6 +33,20 @@ namespace SubnetCalculator
 		{
 			MessageBox.Show("В разработке.", "Информация",
 							MessageBoxButton.OK, MessageBoxImage.Information);  // Вывожу  сообщение с информацией о том, что проект ещё в разработке
+		}
+
+		private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+		{
+			// Отменяем немедленное закрытие главного окна
+			e.Cancel = true;
+
+			// Показываем окно завершения
+			ShutdownWindow shutdown = new ShutdownWindow();
+			shutdown.Owner = this;
+
+			// Когда окно завершения закроется, завершаем приложение
+			shutdown.Closed += (s, args) => Application.Current.Shutdown();
+			shutdown.ShowDialog();
 		}
 	}
 }

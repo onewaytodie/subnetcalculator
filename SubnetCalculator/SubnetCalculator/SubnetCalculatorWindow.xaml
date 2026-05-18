@@ -20,19 +20,29 @@
 
         <!-- Стиль для GroupBox, сделал их белыми и скруглёнными -->
         <Style TargetType="GroupBox">
-            <Setter Property="Background"       Value="{StaticResource CardBackgroundBrush}"/>    <!-- три строки, отвечающие за внешний вид рамки -->
+            <Setter Property="Background"       Value="{StaticResource CardBackgroundBrush}"/>
+            <!-- три строки, отвечающие за внешний вид рамки -->
             <Setter Property="BorderBrush"      Value="{StaticResource BorderBrush}"/>
             <Setter Property="BorderThickness"  Value="1"/>
-            <Setter Property="Margin"           Value="0,10"/>                                      <!-- вертикальный отступ -->
-            <Setter Property="Padding"          Value="0"/>                                         <!-- внутренний -->
-            <Setter Property="FontWeight"       Value="SemiBold"/>                                  <!-- шрифт -->
-            <Setter Property="Foreground"       Value="{StaticResource TextPrimaryBrush}"/>       <!-- цвет текста заголовка --> 
-            <Setter Property="Cursor"           Value="Help"/>                                      <!-- знак вопроса на курсоре -->
-            <Setter Property="ToolTip"          Value="Нажмите для подробной справки (заголовок)"/> <!-- всплывающая подсказка -->
-            <EventSetter Event="MouseLeftButtonUp" Handler="HelpLabel_Click"/>                      <!-- обработчик события -->
-            <Setter Property="Template">                                                            <!-- Создаю свой шаблон -->
+            <Setter Property="Margin"           Value="0,10"/>
+            <!-- вертикальный отступ -->
+            <Setter Property="Padding"          Value="0"/>
+            <!-- внутренний -->
+            <Setter Property="FontWeight"       Value="SemiBold"/>
+            <!-- шрифт -->
+            <Setter Property="Foreground"       Value="{StaticResource TextPrimaryBrush}"/>
+            <!-- цвет текста заголовка -->
+            <Setter Property="Cursor"           Value="Help"/>
+            <!-- знак вопроса на курсоре -->
+            <Setter Property="ToolTip"          Value="Нажмите для подробной справки (заголовок)"/>
+            <!-- всплывающая подсказка -->
+            <EventSetter Event="MouseLeftButtonUp" Handler="HelpLabel_Click"/>
+            <!-- обработчик события -->
+            <Setter Property="Template">
+                <!-- Создаю свой шаблон -->
                 <Setter.Value>
-                    <ControlTemplate TargetType="GroupBox">                                         <!-- внутренний шаблон создаёт заголовок и область содержимого с отступами -->
+                    <ControlTemplate TargetType="GroupBox">
+                        <!-- внутренний шаблон создаёт заголовок и область содержимого с отступами -->
                         <Border Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
@@ -311,3 +321,4 @@
         <TextBlock x:Name="txtError" Grid.Row="5" Foreground="#E53E3E" Margin="0,1" TextWrapping="Wrap"/>
     </Grid>
 </Window>
+<!--https://learn.microsoft.com/ru-ru/dotnet/desktop/wpf/ -->

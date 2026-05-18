@@ -8,7 +8,7 @@
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize">
     <Grid>
-        <Image Source="Image/smeshariki.png" 
+        <Image Source="C:\Users\Danila\source\repos\SubnetCalculator\SubnetCalculator\Image\smeshariki.png" 
                Stretch="UniformToFill" 
                StretchDirection="Both"/>
         <Border CornerRadius="10"/>

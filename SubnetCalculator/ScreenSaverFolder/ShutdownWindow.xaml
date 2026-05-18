@@ -1,0 +1,39 @@
+﻿<Window x:Class="SubnetCalculator.ShutdownWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="До свидания!" Height="300" Width="400"
+        WindowStyle="None" AllowsTransparency="True"
+        Background="Transparent"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        WindowState="Normal">
+    <Grid>
+        <Image Source="C:\Users\Danila\source\repos\SubnetCalculator\SubnetCalculator\Image\Smeshariki_Poka.png" Stretch="UniformToFill"/>
+        <Border Background="#80000000"/>
+        <StackPanel VerticalAlignment="Bottom" Margin="0,0,0,20">
+            <TextBlock Text="До свидания!" 
+                       FontFamily="Comic Sans MS" 
+                       FontSize="28" 
+                       FontWeight="Bold"
+                       Foreground="Yellow"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,5">
+                <TextBlock.Effect>
+                    <DropShadowEffect BlurRadius="5" ShadowDepth="3" Opacity="0.6" Color="Black"/>
+                </TextBlock.Effect>
+            </TextBlock>
+            <TextBlock Text="Завершение работы..." 
+                       FontFamily="Segoe UI" 
+                       FontSize="16" 
+                       Foreground="Yellow"
+                       HorizontalAlignment="Center"/>
+            <ProgressBar IsIndeterminate="True" 
+                         Height="12" 
+                         Width="250" 
+                         Margin="0,15,0,0"
+                         HorizontalAlignment="Center"
+                         Foreground="White" 
+                         Background="Gray"/>
+        </StackPanel>
+    </Grid>
+</Window>
