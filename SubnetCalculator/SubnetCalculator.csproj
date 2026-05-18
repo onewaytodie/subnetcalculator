@@ -55,26 +55,26 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="DetailedSolutionWindow.xaml.cs">
+    <Compile Include="SubnetCalculator\DetailedSolutionWindow.xaml.cs">
       <DependentUpon>DetailedSolutionWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="HelpWindow.xaml.cs">
+    <Compile Include="SubnetCalculator\HelpWindow.xaml.cs">
       <DependentUpon>HelpWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ScreenSaver.xaml.cs">
+    <Compile Include="ScreenSaver\ScreenSaver.xaml.cs">
       <DependentUpon>ScreenSaver.xaml</DependentUpon>
     </Compile>
-    <Compile Include="WindowResult.xaml.cs">
+    <Compile Include="SubnetCalculator\WindowResult.xaml.cs">
       <DependentUpon>WindowResult.xaml</DependentUpon>
     </Compile>
-    <Page Include="DetailedSolutionWindow.xaml">
+    <Page Include="SubnetCalculator\DetailedSolutionWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="HelpWindow.xaml">
+    <Page Include="SubnetCalculator\HelpWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -82,11 +82,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ScreenSaver.xaml">
+    <Page Include="ScreenSaver\ScreenSaver.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SubnetCalculatorWindow.xaml">
+    <Page Include="SubnetCalculator\SubnetCalculatorWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -94,11 +94,11 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="SubnetCalculatorWindow.xaml.cs">
+    <Compile Include="SubnetCalculator\SubnetCalculatorWindow.xaml.cs">
       <DependentUpon>SubnetCalculatorWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="WindowResult.xaml">
+    <Page Include="SubnetCalculator\WindowResult.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
