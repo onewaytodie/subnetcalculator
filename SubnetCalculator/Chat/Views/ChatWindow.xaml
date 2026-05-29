@@ -1,0 +1,85 @@
+﻿<Window x:Class="SubnetCalculator.Chat.Views.ChatWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        xmlns:local="clr-namespace:SubnetCalculator.Chat.Views"
+        Title="Сервер чата" Height="600" Width="900"
+        WindowStartupLocation="CenterOwner"
+        Background="#1E1E1E">
+    <Window.Resources>
+        <local:OwnMessageBackgroundConverter x:Key="OwnMessageBackgroundConverter"/>
+        <local:MessageAlignmentConverter x:Key="MessageAlignmentConverter"/>
+
+        <SolidColorBrush x:Key="BorderDark" Color="#3E3E42"/>
+        <SolidColorBrush x:Key="CardBg" Color="#2D2D30"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="#2C7BE5"/>
+    </Window.Resources>
+
+    <ui:NavigationView x:Name="MainNavView"
+                       PaneDisplayMode="LeftCompact"
+                       IsBackButtonVisible="Collapsed"
+                       IsSettingsVisible="False">
+        <ui:NavigationView.MenuItems>
+            <ui:NavigationViewItem x:Name="ClientsNavItem" Content="Клиенты" Icon="Contact"/>
+        </ui:NavigationView.MenuItems>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Левая панель: список клиентов -->
+            <ListBox x:Name="ClientsListView" 
+                     SelectionChanged="ClientsListView_SelectionChanged"
+                     Background="{StaticResource CardBg}" 
+                     BorderBrush="{StaticResource BorderDark}"
+                     BorderThickness="0,0,1,0">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Margin="5">
+                            <TextBlock Text="🟢" Margin="0,0,8,0" Foreground="LightGreen"/>
+                            <TextBlock Text="{Binding}" Foreground="White"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <!-- Правая область: чат -->
+            <Grid Grid.Column="1" Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <ScrollViewer x:Name="MessagesScrollViewer" Grid.Row="0">
+                    <ItemsControl x:Name="MessagesItemsControl">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Margin="0,2" Padding="8" CornerRadius="8"
+                                        Background="{Binding IsOwn, Converter={StaticResource OwnMessageBackgroundConverter}}"
+                                        HorizontalAlignment="{Binding IsOwn, Converter={StaticResource MessageAlignmentConverter}}">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Author}" FontWeight="Bold" FontSize="11" Foreground="#AAAAAA"/>
+                                        <TextBlock Text="{Binding Text}" TextWrapping="Wrap" Foreground="White"/>
+                                        <TextBlock Text="{Binding Timestamp, StringFormat={}{0:HH:mm:ss}}" FontSize="10" Foreground="#888" HorizontalAlignment="Right"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <Grid Grid.Row="1" Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="MessageTextBox" IsEnabled="False"/>
+                    <Button x:Name="SendButton" Grid.Column="1" Content="Отправить" Width="80" Margin="5,0,0,0"
+                            IsEnabled="False" Click="SendButton_Click"/>
+                </Grid>
+            </Grid>
+        </Grid>
+    </ui:NavigationView>
+</Window>

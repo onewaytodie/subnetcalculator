@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using SubnetCalculator.Chat.Views;
 
 namespace SubnetCalculator
 {
@@ -47,6 +48,19 @@ namespace SubnetCalculator
 			// Когда окно завершения закроется, завершаем приложение
 			shutdown.Closed += (s, args) => Application.Current.Shutdown();
 			shutdown.ShowDialog();
+		}
+
+		private void OpenServer_Click(object sender, RoutedEventArgs e)
+		{
+			ChatWindow chatWindow = new ChatWindow();
+			chatWindow.Owner = this;
+			chatWindow.Show();
+		}
+
+		private void OpenClient_Click(object sender, RoutedEventArgs e)
+		{
+			ClientWindow clientWindow = new ClientWindow();
+			clientWindow.Show(); // не блокирует главное окно
 		}
 	}
 }
