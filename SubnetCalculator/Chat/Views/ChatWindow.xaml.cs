@@ -13,14 +13,8 @@ namespace SubnetCalculator.Chat.Views
 	{
 		private ChatServer _server;
 		private string _selectedClient;
-		private bool _isServerRunning;
 
 		public event PropertyChangedEventHandler PropertyChanged;
-
-		protected virtual void OnPropertyChanged(string propertyName)
-		{
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-		}
 
 		public ChatWindow()
 		{
@@ -37,26 +31,27 @@ namespace SubnetCalculator.Chat.Views
 			_server.ClientDisconnected += OnClientDisconnected;
 			_server.ChatMessageReceived += OnChatMessageReceived;
 
+			// Привязываем список клиентов к коллекции сервера
+			ClientsListView.ItemsSource = _server.ConnectedClients;
+
 			await _server.StartAsync(27015);
-			_isServerRunning = true;
 			AppendLog("Сервер запущен.");
 		}
 
 		private void OnClientConnected(string endpoint)
 		{
-			Dispatcher.Invoke(() =>
-			{
-				ClientsListView.Items.Add(endpoint);
-			});
+			// Не нужно добавлять вручную – ItemsSource обновляется автоматически
 		}
 
 		private void OnClientDisconnected(string endpoint)
 		{
 			Dispatcher.Invoke(() =>
 			{
-				ClientsListView.Items.Remove(endpoint);
 				if (_selectedClient == endpoint)
+				{
 					_selectedClient = null;
+					MessagesItemsControl.Items.Clear();
+				}
 			});
 		}
 
@@ -65,10 +60,7 @@ namespace SubnetCalculator.Chat.Views
 			Dispatcher.Invoke(() =>
 			{
 				if (_selectedClient == endpoint)
-				{
 					MessagesItemsControl.Items.Add(message);
-					ScrollToBottom();
-				}
 			});
 		}
 
@@ -132,34 +124,5 @@ namespace SubnetCalculator.Chat.Views
 			_server?.Stop();
 			base.OnClosing(e);
 		}
-	}
-
-	// ======================= Конвертеры (должны быть в том же пространстве имён) =======================
-	public class OwnMessageBackgroundConverter : IValueConverter
-	{
-		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-		{
-			bool isOwn = (bool)value;
-			if (isOwn)
-			{
-				var brush = Application.Current.TryFindResource("SystemControlHighlightAccentBrush") as SolidColorBrush;
-				return brush ?? new SolidColorBrush(Color.FromRgb(44, 123, 229));
-			}
-			else
-			{
-				var brush = Application.Current.TryFindResource("SystemControlBackgroundChromeWhiteBrush") as SolidColorBrush;
-				return brush ?? new SolidColorBrush(Color.FromRgb(62, 62, 66));
-			}
-		}
-		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
-	}
-
-	public class MessageAlignmentConverter : IValueConverter
-	{
-		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-		{
-			return (bool)value ? HorizontalAlignment.Right : HorizontalAlignment.Left;
-		}
-		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
 	}
 }

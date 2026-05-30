@@ -32,7 +32,7 @@ namespace SubnetCalculator.Chat.Views
 			{
 				_server = new ChatServer();
 				_server.OnLog += AppendLog;
-				//_server.OnMessageReceived += (msg) => AppendLog(msg);
+				_server.OnMessageReceived += (msg) => AppendLog(msg);
 				await _server.StartAsync(port);
 				btnStart.IsEnabled = false;
 				btnStop.IsEnabled = true;

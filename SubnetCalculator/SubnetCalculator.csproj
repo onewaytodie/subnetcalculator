@@ -61,12 +61,14 @@
     <Compile Include="Chat\Models\ChatMessage.cs" />
     <Compile Include="Chat\Services\ChatClient.cs" />
     <Compile Include="Chat\Services\ChatServer.cs" />
+    <Compile Include="Chat\ViewModel\MessageAlignmentConverter.cs" />
     <Compile Include="Chat\Views\ChatWindow.xaml.cs">
       <DependentUpon>ChatWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Chat\Views\ClientWindow.xaml.cs">
       <DependentUpon>ClientWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Chat\ViewModel\OwnMessageBackgroundConverter.cs" />
     <Compile Include="Chat\Views\ServerWindow.xaml.cs">
       <DependentUpon>ServerWindow.xaml</DependentUpon>
     </Compile>
@@ -174,12 +176,12 @@
     <Resource Include="Image\smeshariki_Background.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Image\Smeshariki_Poka.png" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="ModernWpfUI">
       <Version>0.9.4</Version>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Image\Smeshariki_Poka.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
