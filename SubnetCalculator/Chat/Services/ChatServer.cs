@@ -6,7 +6,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
+using System.Windows;  // <-- добавить эту строку
 using SubnetCalculator.Chat.Models;
 
 namespace SubnetCalculator.Chat.Services
@@ -21,7 +21,6 @@ namespace SubnetCalculator.Chat.Services
 
 		public ObservableCollection<string> ConnectedClients { get; private set; } = new ObservableCollection<string>();
 		private readonly ConcurrentDictionary<string, ObservableCollection<ChatMessage>> _clientMessages = new ConcurrentDictionary<string, ObservableCollection<ChatMessage>>();
-		private readonly ConcurrentDictionary<string, TcpClient> _endpointToClient = new ConcurrentDictionary<string, TcpClient>();
 
 		public event Action<string> ClientConnected;
 		public event Action<string> ClientDisconnected;
@@ -60,8 +59,7 @@ namespace SubnetCalculator.Chat.Services
 			foreach (var client in _clients.Keys)
 				client.Close();
 			_clients.Clear();
-			_endpointToClient.Clear();
-			Application.Current.Dispatcher.Invoke(() => ConnectedClients.Clear());
+			ConnectedClients.Clear();
 			_clientMessages.Clear();
 			Log("Сервер остановлен.");
 		}
@@ -83,34 +81,15 @@ namespace SubnetCalculator.Chat.Services
 		private async Task HandleClientAsync(TcpClient client)
 		{
 			string endpoint = client.Client.RemoteEndPoint.ToString();
+			System.IO.File.AppendAllText("debug_conn.txt", $"{DateTime.Now} Клиент {endpoint} подключился{Environment.NewLine}");
+
 			string connectTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
 			_clients[client] = endpoint;
-			_endpointToClient[endpoint] = client;
-
-			// Добавляем в UI список (через Dispatcher)
 			Application.Current.Dispatcher.Invoke(() => ConnectedClients.Add(endpoint));
-
-			var messages = new ObservableCollection<ChatMessage>();
-			_clientMessages[endpoint] = messages;
-
-			var connectMsg = new ChatMessage
-			{
-				Author = "Система",
-				Text = $"Клиент подключился: {endpoint} в {connectTime}",
-				Timestamp = DateTime.Parse(connectTime),
-				IsOwn = false
-			};
-			messages.Add(connectMsg);
-			ChatMessageReceived?.Invoke(endpoint, connectMsg);
-			Log($"[{connectTime}] Клиент подключился: {endpoint}");
+			_clientMessages[endpoint] = new ObservableCollection<ChatMessage>();
 			ClientConnected?.Invoke(endpoint);
-
-			// Отправляем новому клиенту список всех подключённых (кроме него самого)
-			await SendUserListToClient(client, endpoint);
-
-			// Уведомляем всех остальных клиентов об обновлении списка
-			await BroadcastUserList();
+			Log($"[{connectTime}] Клиент подключился: {endpoint}");
 
 			NetworkStream stream = client.GetStream();
 			byte[] buffer = new byte[4096];
@@ -122,42 +101,27 @@ namespace SubnetCalculator.Chat.Services
 					int bytes = await stream.ReadAsync(buffer, 0, buffer.Length);
 					if (bytes == 0) break;
 
-					string rawMsg = Encoding.UTF8.GetString(buffer, 0, bytes);
+					string msg = Encoding.UTF8.GetString(buffer, 0, bytes);
+					System.IO.File.AppendAllText("debug_msgs.txt", $"{DateTime.Now} Получено от {endpoint}: {msg}{Environment.NewLine}");
+
 					string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-					// Обработка приватных сообщений
-					if (rawMsg.StartsWith("/msg "))
-					{
-						// Формат: /msg получатель сообщение
-						var parts = rawMsg.Substring(5).Split(new[] { ' ' }, 2);
-						if (parts.Length == 2)
-						{
-							string recipient = parts[0];
-							string message = parts[1];
-							await SendPrivateMessage(endpoint, recipient, message, time);
-						}
-						else
-						{
-							await SendPrivateMessage(endpoint, endpoint, "Неверный формат. Используйте: /msg ник сообщение", time);
-						}
-						continue;
-					}
-
-					// Обычное сообщение (broadcast)
-					string formatted = $"[{time}] {endpoint}: {rawMsg}";
+					string formatted = $"[{time}] {endpoint}: {msg}";
 					Log(formatted);
 					OnMessageReceived?.Invoke(formatted);
 
 					var chatMsg = new ChatMessage
 					{
 						Author = endpoint,
-						Text = rawMsg,
+						Text = msg,
 						Timestamp = DateTime.Parse(time),
 						IsOwn = false
 					};
-					messages.Add(chatMsg);
-					ChatMessageReceived?.Invoke(endpoint, chatMsg);
+					if (_clientMessages.TryGetValue(endpoint, out var messages))
+					{
+						Application.Current.Dispatcher.Invoke(() => messages.Add(chatMsg));
+					}
 					await BroadcastAsync(formatted, client);
+					ChatMessageReceived?.Invoke(endpoint, chatMsg);
 				}
 			}
 			catch (Exception ex)
@@ -167,119 +131,18 @@ namespace SubnetCalculator.Chat.Services
 			finally
 			{
 				_clients.TryRemove(client, out _);
-				_endpointToClient.TryRemove(endpoint, out _);
 				Application.Current.Dispatcher.Invoke(() => ConnectedClients.Remove(endpoint));
-				string disconnectTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-				var disconnectMsg = new ChatMessage
-				{
-					Author = "Система",
-					Text = $"Клиент отключился: {endpoint} в {disconnectTime}",
-					Timestamp = DateTime.Parse(disconnectTime),
-					IsOwn = false
-				};
-				if (_clientMessages.TryGetValue(endpoint, out var clientMsgs))
-					clientMsgs.Add(disconnectMsg);
-				ChatMessageReceived?.Invoke(endpoint, disconnectMsg);
-				Log($"[{disconnectTime}] Клиент отключился: {endpoint}");
 				ClientDisconnected?.Invoke(endpoint);
-				await BroadcastUserList(); // уведомляем остальных об изменении списка
+				Log($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Клиент отключился: {endpoint}");
 				client.Close();
 			}
 		}
 
-		private async Task SendUserListToClient(TcpClient client, string selfEndpoint)
-		{
-			var list = new StringBuilder();
-			list.Append("/users ");
-			foreach (var ep in _endpointToClient.Keys)
-			{
-				if (ep != selfEndpoint)
-					list.Append(ep).Append(",");
-			}
-			string userListMsg = list.ToString().TrimEnd(',');
-			byte[] data = Encoding.UTF8.GetBytes(userListMsg);
-			await client.GetStream().WriteAsync(data, 0, data.Length);
-		}
-
-		private async Task BroadcastUserList()
-		{
-			var list = new StringBuilder();
-			list.Append("/users ");
-			foreach (var ep in _endpointToClient.Keys)
-				list.Append(ep).Append(",");
-			string userListMsg = list.ToString().TrimEnd(',');
-			byte[] data = Encoding.UTF8.GetBytes(userListMsg);
-			foreach (var client in _clients.Keys)
-			{
-				try
-				{
-					if (client.Connected)
-						await client.GetStream().WriteAsync(data, 0, data.Length);
-				}
-				catch { }
-			}
-		}
-
-		private async Task SendPrivateMessage(string sender, string recipient, string message, string time)
-		{
-			if (!_endpointToClient.TryGetValue(recipient, out var recipientClient))
-			{
-				// отправить отправителю сообщение об ошибке
-				if (_endpointToClient.TryGetValue(sender, out var senderClient2))
-				{
-					string errorMsg = $"[Система] Пользователь {recipient} не найден.";
-					byte[] data = Encoding.UTF8.GetBytes(errorMsg);
-					await senderClient2.GetStream().WriteAsync(data, 0, data.Length);
-				}
-				return;
-			}
-
-			string formatted = $"[{time}] Приватно от {sender}: {message}";
-			// Сохраняем в историю отправителя и получателя
-			var senderMsg = new ChatMessage
-			{
-				Author = sender,
-				Text = $"Приватно для {recipient}: {message}",
-				Timestamp = DateTime.Parse(time),
-				IsOwn = true
-			};
-			var recipientMsg = new ChatMessage
-			{
-				Author = sender,
-				Text = message,
-				Timestamp = DateTime.Parse(time),
-				IsOwn = false
-			};
-
-			if (_clientMessages.TryGetValue(sender, out var senderMsgs))
-				senderMsgs.Add(senderMsg);
-			if (_clientMessages.TryGetValue(recipient, out var recipientMsgs))
-				recipientMsgs.Add(recipientMsg);
-
-			ChatMessageReceived?.Invoke(sender, senderMsg);
-			ChatMessageReceived?.Invoke(recipient, recipientMsg);
-
-			// Отправляем получателю
-			byte[] dataToRecipient = Encoding.UTF8.GetBytes($"[{time}] {sender}: {message}");
-			await recipientClient.GetStream().WriteAsync(dataToRecipient, 0, dataToRecipient.Length);
-
-			// Подтверждение отправителю (опционально)
-			if (_endpointToClient.TryGetValue(sender, out var senderClient))
-			{
-				string confirmation = $"[{time}] Вы отправили {recipient}: {message}";
-				byte[] dataToSender = Encoding.UTF8.GetBytes(confirmation);
-				await senderClient.GetStream().WriteAsync(dataToSender, 0, dataToSender.Length);
-			}
-
-			Log($"Приватное сообщение от {sender} к {recipient}: {message}");
-		}
-
-		private async Task BroadcastAsync(string message, TcpClient skipClient)
+		private async Task BroadcastAsync(string message, TcpClient senderClient)
 		{
 			byte[] data = Encoding.UTF8.GetBytes(message);
 			foreach (var client in _clients.Keys)
 			{
-				if (client == skipClient) continue;
 				try
 				{
 					if (client.Connected)
@@ -311,12 +174,12 @@ namespace SubnetCalculator.Chat.Services
 		private void Log(string text)
 		{
 			OnLog?.Invoke(text);
-			lock (_fileLock)
-			{
-				File.AppendAllText(_logFilePath, text + Environment.NewLine);
-			}
+			lock (_fileLock) { File.AppendAllText(_logFilePath, text + Environment.NewLine); }
 		}
 
-		public void Dispose() => Stop();
+		public void Dispose()
+		{
+			Stop();
+		}
 	}
 }

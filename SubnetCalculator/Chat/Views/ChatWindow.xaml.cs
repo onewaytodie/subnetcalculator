@@ -1,9 +1,7 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Globalization;
 using System.Windows;
-using System.Windows.Data;
-using System.Windows.Media;
 using SubnetCalculator.Chat.Models;
 using SubnetCalculator.Chat.Services;
 
@@ -14,12 +12,22 @@ namespace SubnetCalculator.Chat.Views
 		private ChatServer _server;
 		private string _selectedClient;
 
+		// Коллекция для отображения ВСЕХ сообщений в серверном окне
+		private ObservableCollection<ChatMessage> _allMessages = new ObservableCollection<ChatMessage>();
+
 		public event PropertyChangedEventHandler PropertyChanged;
+
+		protected virtual void OnPropertyChanged(string propertyName)
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+		}
 
 		public ChatWindow()
 		{
 			InitializeComponent();
 			DataContext = this;
+			// Привязываем ItemsControl к общей коллекции сообщений
+			MessagesItemsControl.ItemsSource = _allMessages;
 			Loaded += ChatWindow_Loaded;
 		}
 
@@ -31,36 +39,52 @@ namespace SubnetCalculator.Chat.Views
 			_server.ClientDisconnected += OnClientDisconnected;
 			_server.ChatMessageReceived += OnChatMessageReceived;
 
-			// Привязываем список клиентов к коллекции сервера
-			ClientsListView.ItemsSource = _server.ConnectedClients;
-
 			await _server.StartAsync(27015);
 			AppendLog("Сервер запущен.");
 		}
 
 		private void OnClientConnected(string endpoint)
 		{
-			// Не нужно добавлять вручную – ItemsSource обновляется автоматически
+			Dispatcher.Invoke(() =>
+			{
+				ClientsListView.Items.Add(endpoint);
+				// Добавляем системное сообщение в чат
+				_allMessages.Add(new ChatMessage
+				{
+					Author = "Система",
+					Text = $"Клиент {endpoint} подключился в {DateTime.Now:HH:mm:ss}",
+					Timestamp = DateTime.Now,
+					IsOwn = false
+				});
+				ScrollToBottom();
+			});
 		}
 
 		private void OnClientDisconnected(string endpoint)
 		{
 			Dispatcher.Invoke(() =>
 			{
-				if (_selectedClient == endpoint)
+				ClientsListView.Items.Remove(endpoint);
+				_allMessages.Add(new ChatMessage
 				{
+					Author = "Система",
+					Text = $"Клиент {endpoint} отключился в {DateTime.Now:HH:mm:ss}",
+					Timestamp = DateTime.Now,
+					IsOwn = false
+				});
+				ScrollToBottom();
+				if (_selectedClient == endpoint)
 					_selectedClient = null;
-					MessagesItemsControl.Items.Clear();
-				}
 			});
 		}
 
 		private void OnChatMessageReceived(string endpoint, ChatMessage message)
 		{
+			// Добавляем ВСЕ сообщения в общую коллекцию (показываем в серверном окне)
 			Dispatcher.Invoke(() =>
 			{
-				if (_selectedClient == endpoint)
-					MessagesItemsControl.Items.Add(message);
+				_allMessages.Add(message);
+				ScrollToBottom();
 			});
 		}
 
@@ -69,14 +93,7 @@ namespace SubnetCalculator.Chat.Views
 			if (ClientsListView.SelectedItem is string client)
 			{
 				_selectedClient = client;
-				var messages = _server.GetClientMessages(client);
-				MessagesItemsControl.Items.Clear();
-				if (messages != null)
-				{
-					foreach (var msg in messages)
-						MessagesItemsControl.Items.Add(msg);
-				}
-				ScrollToBottom();
+				// Активируем поле ввода для администратора
 				MessageTextBox.IsEnabled = true;
 				SendButton.IsEnabled = true;
 			}
@@ -99,8 +116,10 @@ namespace SubnetCalculator.Chat.Views
 				Timestamp = DateTime.Now,
 				IsOwn = true
 			};
-			MessagesItemsControl.Items.Add(adminMsg);
+			// Добавляем в общий чат сервера
+			_allMessages.Add(adminMsg);
 			ScrollToBottom();
+			// Отправляем админское сообщение всем клиентам
 			await _server.SendAdminMessageAsync($"[Админ] {text}");
 			MessageTextBox.Clear();
 		}

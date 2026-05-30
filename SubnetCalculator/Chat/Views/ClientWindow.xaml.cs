@@ -16,6 +16,7 @@ namespace SubnetCalculator.Chat.Views
 		private string _selectedUser;
 		private ObservableCollection<ChatMessage> _messages = new ObservableCollection<ChatMessage>();
 		private ObservableCollection<string> _users = new ObservableCollection<string>();
+		private bool _disposing = false;
 
 		public ClientWindow()
 		{
@@ -55,27 +56,30 @@ namespace SubnetCalculator.Chat.Views
 			byte[] buffer = new byte[4096];
 			try
 			{
-				while (_isConnected)
+				while (_isConnected && !_disposing)
 				{
 					int bytes = await _stream.ReadAsync(buffer, 0, buffer.Length);
 					if (bytes == 0) break;
+
 					string msg = Encoding.UTF8.GetString(buffer, 0, bytes);
 
+					// Обработка специальных команд от сервера
 					if (msg.StartsWith("/users "))
 					{
 						string usersData = msg.Substring(7);
 						var users = usersData.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
 						Dispatcher.Invoke(() =>
 						{
 							_users.Clear();
 							_users.Add("Общий чат");
 							foreach (var u in users)
-								if (!string.IsNullOrEmpty(u))
-									_users.Add(u);
+								_users.Add(u);
 						});
 						continue;
 					}
 
+					// Обычное сообщение от сервера
 					Dispatcher.Invoke(() => AddMessage(new ChatMessage
 					{
 						Author = "Сервер",
@@ -85,14 +89,17 @@ namespace SubnetCalculator.Chat.Views
 					}));
 				}
 			}
+			catch (ObjectDisposedException)
+			{
+				// Ожидаемое исключение при закрытии – игнорируем
+			}
 			catch (Exception ex)
 			{
 				Dispatcher.Invoke(() => AddSystemMessage($"Ошибка приёма: {ex.Message}"));
+				// Если произошла неожиданная ошибка, отключаемся
+				Disconnect();
 			}
-			finally
-			{
-				Dispatcher.Invoke(() => Disconnect());
-			}
+			// Убираем вызов Disconnect() из finally – теперь он вызывается только там, где нужен
 		}
 
 		private void SendButton_Click(object sender, RoutedEventArgs e)
@@ -160,6 +167,8 @@ namespace SubnetCalculator.Chat.Views
 
 		private void Disconnect()
 		{
+			if (_disposing) return;
+			_disposing = true;
 			_isConnected = false;
 			_stream?.Close();
 			_client?.Close();
@@ -167,8 +176,13 @@ namespace SubnetCalculator.Chat.Views
 			btnConnect.IsEnabled = true;
 			btnDisconnect.IsEnabled = false;
 			btnSend.IsEnabled = false;
+			txtMessage.IsEnabled = false;
+			_disposing = false;
 		}
 
-		private void BtnDisconnect_Click(object sender, RoutedEventArgs e) => Disconnect();
+		private void BtnDisconnect_Click(object sender, RoutedEventArgs e)
+		{
+			Disconnect();
+		}
 	}
 }

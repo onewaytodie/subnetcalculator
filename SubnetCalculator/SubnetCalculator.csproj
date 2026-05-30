@@ -59,7 +59,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Chat\Models\ChatMessage.cs" />
-    <Compile Include="Chat\Services\ChatClient.cs" />
     <Compile Include="Chat\Services\ChatServer.cs" />
     <Compile Include="Chat\ViewModel\MessageAlignmentConverter.cs" />
     <Compile Include="Chat\Views\ChatWindow.xaml.cs">
@@ -69,9 +68,6 @@
       <DependentUpon>ClientWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Chat\ViewModel\OwnMessageBackgroundConverter.cs" />
-    <Compile Include="Chat\Views\ServerWindow.xaml.cs">
-      <DependentUpon>ServerWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="ScreenSaverFolder\ShutdownWindow.xaml.cs">
       <DependentUpon>ShutdownWindow.xaml</DependentUpon>
     </Compile>
@@ -95,10 +91,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Chat\Views\ClientWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Chat\Views\ServerWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -183,5 +175,6 @@
       <Version>0.9.4</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

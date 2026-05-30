@@ -8,6 +8,39 @@
         Title="IP-Lab" Height="450" Width="600"
         WindowStartupLocation="CenterScreen"
         Icon="C:\Users\Danila\source\repos\SubnetCalculator\SubnetCalculator\Icon\tools.ico">
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="Foreground" Value="#2C3E50"/>
+            <Setter Property="BorderBrush" Value="#BDC3C7"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Width" Value="160"/>
+            <Setter Property="Height" Value="90"/>
+            <Setter Property="Margin" Value="12,12,12,12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#ECF0F1"/>
+                                <Setter Property="Foreground" Value="#2980B9"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#BDC3C7"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <Grid>
         <!-- Фоновое изображение -->
         <Image Source="Image/smeshariki_MainWindow_Background.png" 
@@ -26,49 +59,44 @@
                 <TextBlock Text="Сетевые помощники" FontSize="22" Foreground="White"/>
             </Border>
 
-            <!-- Кнопки -->
-            <WrapPanel Grid.Row="1" Margin="0,20" HorizontalAlignment="Center">
-                <Button Width="150" Height="100" Margin="10" Click="OpenSubnetCalculator_Click">
+            <!-- Кнопки – центрированы, с зазором -->
+            <WrapPanel Grid.Row="1" Margin="0,40" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Button Click="OpenSubnetCalculator_Click">
                     <StackPanel>
                         <TextBlock Text="🧮" FontSize="32" TextAlignment="Center"/>
                         <TextBlock Text="Калькулятор подсетей" TextAlignment="Center" TextWrapping="Wrap"/>
                     </StackPanel>
                 </Button>
-
-                <Button Width="150" Height="100" Margin="10" Click="OpenServer_Click">
+                <Button Click="OpenServer_Click">
                     <StackPanel>
-                        <TextBlock Text="🖥️" FontSize="32"/>
-                        <TextBlock Text="Сервер чата" TextAlignment="Center"/>
+                        <TextBlock Text="🖥️" FontSize="32" TextAlignment="Center"/>
+                        <TextBlock Text="Сервер чата" TextAlignment="Center" TextWrapping="Wrap"/>
                     </StackPanel>
                 </Button>
-                <Button Width="150" Height="100" Margin="10" Click="OpenClient_Click">
+                <Button Click="OpenClient_Click">
                     <StackPanel>
-                        <TextBlock Text="💻" FontSize="32"/>
-                        <TextBlock Text="Клиент чата" TextAlignment="Center"/>
+                        <TextBlock Text="💻" FontSize="32" TextAlignment="Center"/>
+                        <TextBlock Text="Клиент чата" TextAlignment="Center" TextWrapping="Wrap"/>
                     </StackPanel>
                 </Button>
-
-                <Button Width="150" Height="100" Margin="10" Click="ShowPlaceholder_Click">
+                <Button Click="ShowPlaceholder_Click">
                     <StackPanel>
-                        <TextBlock Text="📁" FontSize="32"/>
-                        <TextBlock Text="Проект 4" TextAlignment="Center"/>
+                        <TextBlock Text="📁" FontSize="32" TextAlignment="Center"/>
+                        <TextBlock Text="Проект 4" TextAlignment="Center" TextWrapping="Wrap"/>
                     </StackPanel>
                 </Button>
-                
-                <Button Width="150" Height="100" Margin="10" Click="ShowPlaceholder_Click">
+                <Button Click="ShowPlaceholder_Click">
                     <StackPanel>
-                        <TextBlock Text="📁" FontSize="32"/>
-                        <TextBlock Text="Проект 5" TextAlignment="Center"/>
+                        <TextBlock Text="📁" FontSize="32" TextAlignment="Center"/>
+                        <TextBlock Text="Проект 5" TextAlignment="Center" TextWrapping="Wrap"/>
                     </StackPanel>
                 </Button>
-
-                <Button Width="150" Height="100" Margin="10" Click="ShowPlaceholder_Click">
+                <Button Click="ShowPlaceholder_Click">
                     <StackPanel>
-                        <TextBlock Text="📁" FontSize="32"/>
-                        <TextBlock Text="Проект 6" TextAlignment="Center"/>
+                        <TextBlock Text="📁" FontSize="32" TextAlignment="Center"/>
+                        <TextBlock Text="Проект 6" TextAlignment="Center" TextWrapping="Wrap"/>
                     </StackPanel>
                 </Button>
-                
             </WrapPanel>
         </Grid>
     </Grid>
