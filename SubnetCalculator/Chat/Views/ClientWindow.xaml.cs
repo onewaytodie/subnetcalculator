@@ -13,6 +13,7 @@ namespace SubnetCalculator.Chat.Views
 			InitializeComponent();
 		}
 
+
 		private async void BtnConnect_Click(object sender, RoutedEventArgs e)
 		{
 			if (!int.TryParse(txtPort.Text, out int port))
