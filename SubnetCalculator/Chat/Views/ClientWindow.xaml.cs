@@ -39,10 +39,9 @@ namespace SubnetCalculator.Chat.Views
 				await _client.ConnectAsync(txtServerIP.Text, port);
 				_stream = _client.GetStream();
 
-				string nick = txtNick.Text.Trim();
-				if (string.IsNullOrEmpty(nick)) nick = "User";
-				_myNick = nick;
-				byte[] nickData = Encoding.UTF8.GetBytes($"/nick {nick}");
+				_myNick = txtNick.Text.Trim();
+				if (string.IsNullOrEmpty(_myNick)) _myNick = "User";
+				byte[] nickData = Encoding.UTF8.GetBytes($"/nick {_myNick}");
 				await _stream.WriteAsync(nickData, 0, nickData.Length);
 
 				byte[] buffer = new byte[4096];
@@ -119,18 +118,11 @@ namespace SubnetCalculator.Chat.Views
 			string msg = txtMessage.Text.Trim();
 			if (string.IsNullOrEmpty(msg)) return;
 
-			if (_selectedUser == null || string.IsNullOrEmpty(_selectedUser))
-			{
-				AddSystemMessage("Сначала выберите собеседника из списка.");
-				return;
-			}
-
-			if (_selectedUser == "Общий чат")
+			if (_selectedUser == null || _selectedUser == "Общий чат")
 			{
 				string command = $"/all {msg}";
 				byte[] data = Encoding.UTF8.GetBytes(command);
 				_stream.Write(data, 0, data.Length);
-				// Локально добавляем своё сообщение, чтобы сразу видеть
 				AddMessage(new ChatMessage { Author = "Я", Text = msg, Timestamp = DateTime.Now, IsOwn = true });
 			}
 			else
@@ -138,12 +130,9 @@ namespace SubnetCalculator.Chat.Views
 				string command = $"/msg {_selectedUser} {msg}";
 				byte[] data = Encoding.UTF8.GetBytes(command);
 				_stream.Write(data, 0, data.Length);
-				// Локально добавляем своё сообщение
 				AddMessage(new ChatMessage { Author = "Я", Text = msg, Timestamp = DateTime.Now, IsOwn = true });
 			}
-
 			txtMessage.Clear();
-			txtMessage.Focus();
 		}
 
 		private void UsersListBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)

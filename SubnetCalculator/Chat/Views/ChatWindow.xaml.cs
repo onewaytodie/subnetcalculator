@@ -152,7 +152,6 @@ namespace SubnetCalculator.Chat.Views
 			if (_selectedDialogKey == "Общий чат")
 			{
 				await _server.SendAdminMessageToAll($"[Админ] {text}");
-				// Не добавляем локально, т.к. сообщение придёт через BroadcastMessageReceived
 			}
 			else
 			{
@@ -160,7 +159,6 @@ namespace SubnetCalculator.Chat.Views
 				if (parts.Length == 2)
 				{
 					await _server.SendAdminMessageToDialog(parts[0], parts[1], text);
-					// Не добавляем локально, т.к. сообщение придёт через DialogMessageReceived
 				}
 			}
 			MessageTextBox.Clear();
