@@ -16,11 +16,7 @@ namespace SubnetCalculator.Chat.Views
 		private ObservableCollection<string> _dialogsList = new ObservableCollection<string>();
 
 		public event PropertyChangedEventHandler PropertyChanged;
-
-		protected virtual void OnPropertyChanged(string propertyName)
-		{
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-		}
+		protected void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
 		public ChatWindow()
 		{
@@ -83,10 +79,7 @@ namespace SubnetCalculator.Chat.Views
 			Dispatcher.Invoke(() =>
 			{
 				if (_selectedDialogKey == dialogKey)
-				{
 					_currentMessages.Add(message);
-					ScrollToBottom();
-				}
 				UpdateDialogsList();
 			});
 		}
@@ -96,10 +89,7 @@ namespace SubnetCalculator.Chat.Views
 			Dispatcher.Invoke(() =>
 			{
 				if (_selectedDialogKey == "Общий чат")
-				{
 					_currentMessages.Add(message);
-					ScrollToBottom();
-				}
 			});
 		}
 
@@ -146,10 +136,8 @@ namespace SubnetCalculator.Chat.Views
 				{
 					var messages = _server.GetDialogMessages(parts[0], parts[1]);
 					if (messages != null)
-					{
 						foreach (var msg in messages)
 							_currentMessages.Add(msg);
-					}
 				}
 			}
 			ScrollToBottom();
@@ -164,7 +152,7 @@ namespace SubnetCalculator.Chat.Views
 			if (_selectedDialogKey == "Общий чат")
 			{
 				await _server.SendAdminMessageToAll($"[Админ] {text}");
-				// Не добавляем локально – сообщение придёт через BroadcastMessageReceived
+				// Не добавляем локально, т.к. сообщение придёт через BroadcastMessageReceived
 			}
 			else
 			{
@@ -172,7 +160,7 @@ namespace SubnetCalculator.Chat.Views
 				if (parts.Length == 2)
 				{
 					await _server.SendAdminMessageToDialog(parts[0], parts[1], text);
-					// Не добавляем локально – сообщение придёт через DialogMessageReceived
+					// Не добавляем локально, т.к. сообщение придёт через DialogMessageReceived
 				}
 			}
 			MessageTextBox.Clear();
@@ -187,10 +175,7 @@ namespace SubnetCalculator.Chat.Views
 			}));
 		}
 
-		private void AppendLog(string text)
-		{
-			System.Diagnostics.Debug.WriteLine(text);
-		}
+		private void AppendLog(string text) => System.Diagnostics.Debug.WriteLine(text);
 
 		protected override void OnClosing(CancelEventArgs e)
 		{

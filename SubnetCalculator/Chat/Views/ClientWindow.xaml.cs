@@ -89,10 +89,7 @@ namespace SubnetCalculator.Chat.Views
 							_users.Clear();
 							_users.Add("Общий чат");
 							foreach (var u in users)
-							{
-								if (u != _myNick)
-									_users.Add(u);
-							}
+								if (u != _myNick) _users.Add(u);
 						});
 						continue;
 					}
@@ -128,20 +125,23 @@ namespace SubnetCalculator.Chat.Views
 				return;
 			}
 
-			string command;
 			if (_selectedUser == "Общий чат")
 			{
-				command = $"/all {msg}";
+				string command = $"/all {msg}";
+				byte[] data = Encoding.UTF8.GetBytes(command);
+				_stream.Write(data, 0, data.Length);
+				// Локально добавляем своё сообщение, чтобы сразу видеть
 				AddMessage(new ChatMessage { Author = "Я", Text = msg, Timestamp = DateTime.Now, IsOwn = true });
 			}
 			else
 			{
-				command = $"/msg {_selectedUser} {msg}";
-				AddMessage(new ChatMessage { Author = $"Я -> {_selectedUser}", Text = msg, Timestamp = DateTime.Now, IsOwn = true });
+				string command = $"/msg {_selectedUser} {msg}";
+				byte[] data = Encoding.UTF8.GetBytes(command);
+				_stream.Write(data, 0, data.Length);
+				// Локально добавляем своё сообщение
+				AddMessage(new ChatMessage { Author = "Я", Text = msg, Timestamp = DateTime.Now, IsOwn = true });
 			}
 
-			byte[] data = Encoding.UTF8.GetBytes(command);
-			_stream.Write(data, 0, data.Length);
 			txtMessage.Clear();
 			txtMessage.Focus();
 		}
@@ -166,13 +166,7 @@ namespace SubnetCalculator.Chat.Views
 
 		private void AddSystemMessage(string text)
 		{
-			AddMessage(new ChatMessage
-			{
-				Author = "Система",
-				Text = text,
-				Timestamp = DateTime.Now,
-				IsOwn = false
-			});
+			AddMessage(new ChatMessage { Author = "Система", Text = text, Timestamp = DateTime.Now, IsOwn = false });
 		}
 
 		private void Disconnect()
