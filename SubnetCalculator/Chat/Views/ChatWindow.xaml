@@ -30,8 +30,8 @@
             </Grid.ColumnDefinitions>
 
             <!-- Левая панель: список клиентов -->
-            <ListBox x:Name="ClientsListView" 
-                     SelectionChanged="ClientsListView_SelectionChanged"
+            <ListBox x:Name="DialogsListView" 
+         SelectionChanged="DialogsListView_SelectionChanged"
                      Background="{StaticResource CardBg}" 
                      BorderBrush="{StaticResource BorderDark}"
                      BorderThickness="0,0,1,0">
