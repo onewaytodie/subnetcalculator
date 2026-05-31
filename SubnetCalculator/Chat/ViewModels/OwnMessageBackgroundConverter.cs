@@ -9,12 +9,9 @@ namespace SubnetCalculator.Chat.Views
 	{
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			if (value is bool isOwn && isOwn)
-				return new SolidColorBrush(Color.FromRgb(0x00, 0x78, 0xD4));
-			return new SolidColorBrush(Color.FromRgb(0x33, 0x33, 0x33));
+			bool isOwn = value is bool b && b;
+			return isOwn ? new SolidColorBrush(Color.FromRgb(44, 123, 229)) : new SolidColorBrush(Color.FromRgb(62, 62, 66));
 		}
-
-		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-			=> throw new NotImplementedException();
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
 	}
 }

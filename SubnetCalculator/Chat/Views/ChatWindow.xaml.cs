@@ -93,15 +93,16 @@ namespace SubnetCalculator.Chat.Views
 			});
 		}
 
+
 		private void UpdateDialogsList()
 		{
 			Dispatcher.Invoke(() =>
 			{
-				string[] dialogs = server.GetAllDialogs().ToArray();
+				var dialogs = server.GetAllDialogs().ToList();
 				dialogsList.Clear();
 				dialogsList.Add("Общий чат");
-				foreach (string dialog in dialogs.OrderBy(x => x))
-					dialogsList.Add(dialog);
+				foreach (var d in dialogs.OrderBy(x => x))
+					dialogsList.Add(d);
 			});
 		}
 
@@ -126,17 +127,17 @@ namespace SubnetCalculator.Chat.Views
 			currentMessages.Clear();
 			if (selectedDialogKey == "Общий чат")
 			{
-				foreach (ChatMessage msg in server.GetBroadcastMessages())
+				foreach (var msg in server.GetBroadcastMessages())
 					currentMessages.Add(msg);
 			}
 			else
 			{
-				string[] parts = selectedDialogKey.Split('|');
+				var parts = selectedDialogKey.Split('|');
 				if (parts.Length == 2)
 				{
-					ObservableCollection<ChatMessage> messages = server.GetDialogMessages(parts[0], parts[1]);
+					var messages = server.GetDialogMessages(parts[0], parts[1]);
 					if (messages != null)
-						foreach (ChatMessage msg in messages)
+						foreach (var msg in messages)
 							currentMessages.Add(msg);
 				}
 			}
@@ -155,7 +156,7 @@ namespace SubnetCalculator.Chat.Views
 			}
 			else
 			{
-				string[] parts = selectedDialogKey.Split('|');
+				var parts = selectedDialogKey.Split('|');
 				if (parts.Length == 2)
 				{
 					await server.SendAdminMessageToDialog(parts[0], parts[1], text);
@@ -174,6 +175,7 @@ namespace SubnetCalculator.Chat.Views
 		}
 
 		private void AppendLog(string text) => System.Diagnostics.Debug.WriteLine(text);
+
 
 		protected override void OnClosing(CancelEventArgs e)
 		{

@@ -41,6 +41,12 @@ namespace SubnetCalculator.Chat.Views
 
 				myNick = txtNick.Text.Trim();
 				if (string.IsNullOrEmpty(myNick)) myNick = "User";
+				if (myNick.Equals("Админ", StringComparison.OrdinalIgnoreCase))
+				{
+					MessageBox.Show("Ник 'Админ' зарезервирован для сервера. Выберите другой ник.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+					client.Close();
+					return;
+				}
 				byte[] nickData = Encoding.UTF8.GetBytes($"/nick {myNick}");
 				await stream.WriteAsync(nickData, 0, nickData.Length);
 
@@ -90,16 +96,17 @@ namespace SubnetCalculator.Chat.Views
 							foreach (string u in usersArray)
 								if (u != myNick) users.Add(u);
 						});
-						continue;
 					}
-
-					Dispatcher.Invoke(() => AddMessage(new ChatMessage
+					else
 					{
-						Author = "Сервер",
-						Text = msg,
-						Timestamp = DateTime.Now,
-						IsOwn = false
-					}));
+						Dispatcher.Invoke(() => AddMessage(new ChatMessage
+						{
+							Author = "Сервер",
+							Text = msg,
+							Timestamp = DateTime.Now,
+							IsOwn = false
+						}));
+					}
 				}
 			}
 			catch (Exception ex)
@@ -110,6 +117,14 @@ namespace SubnetCalculator.Chat.Views
 			{
 				Dispatcher.Invoke(() => Disconnect());
 			}
+		}
+
+
+
+		private async void SendFileButton_Click(object sender, RoutedEventArgs e)
+		{
+			AddSystemMessage("Отправка файлов временно отключена.");
+			return;
 		}
 
 		private void SendButton_Click(object sender, RoutedEventArgs e)
@@ -170,6 +185,7 @@ namespace SubnetCalculator.Chat.Views
 			btnConnect.IsEnabled = true;
 			btnDisconnect.IsEnabled = false;
 			btnSend.IsEnabled = false;
+			btnSendFile.IsEnabled = false;
 			txtMessage.IsEnabled = false;
 		}
 

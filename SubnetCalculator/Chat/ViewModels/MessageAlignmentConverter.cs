@@ -9,12 +9,8 @@ namespace SubnetCalculator.Chat.Views
 	{
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			if (value is bool isOwn && isOwn)
-				return HorizontalAlignment.Right;
-			return HorizontalAlignment.Left;
+			return (value is bool isOwn && isOwn) ? HorizontalAlignment.Right : HorizontalAlignment.Left;
 		}
-
-		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-			=> throw new NotImplementedException();
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
 	}
 }

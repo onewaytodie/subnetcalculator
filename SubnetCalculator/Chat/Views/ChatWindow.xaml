@@ -3,16 +3,47 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ui="http://schemas.modernwpf.com/2019"
         xmlns:local="clr-namespace:SubnetCalculator.Chat.Views"
-        Title="Сервер чата" Height="600" Width="900"
+        Title="Сервер чата" Height="600" Width="950"
         WindowStartupLocation="CenterOwner"
         Background="#1E1E1E">
     <Window.Resources>
-        <local:OwnMessageBackgroundConverter x:Key="OwnMessageBackgroundConverter"/>
         <local:MessageAlignmentConverter x:Key="MessageAlignmentConverter"/>
 
         <SolidColorBrush x:Key="BorderDark" Color="#3E3E42"/>
         <SolidColorBrush x:Key="CardBg" Color="#2D2D30"/>
         <SolidColorBrush x:Key="AccentBrush" Color="#2C7BE5"/>
+        <SolidColorBrush x:Key="AccentHoverBrush" Color="#1E5EC7"/>
+        <SolidColorBrush x:Key="AccentPressedBrush" Color="#134B8E"/>
+
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource AccentHoverBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="{StaticResource AccentPressedBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#555555"/>
+                                <Setter Property="Foreground" Value="#999999"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <ui:NavigationView x:Name="MainNavView"
@@ -25,25 +56,34 @@
 
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="280"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Левая панель: список клиентов -->
-            <ListBox x:Name="DialogsListView" 
-         SelectionChanged="DialogsListView_SelectionChanged"
-                     Background="{StaticResource CardBg}" 
-                     BorderBrush="{StaticResource BorderDark}"
-                     BorderThickness="0,0,1,0">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Margin="5">
-                            <TextBlock Text="🟢" Margin="0,0,8,0" Foreground="LightGreen"/>
-                            <TextBlock Text="{Binding}" Foreground="White"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+            <!-- Левая панель: диалоги и запросы файлов -->
+            <Border Background="{StaticResource CardBg}" BorderBrush="{StaticResource BorderDark}" BorderThickness="0,0,1,0">
+                <StackPanel>
+                    <TextBlock Text="Диалоги" FontWeight="Bold" Margin="10,10,0,5" Foreground="White"/>
+                    <ListBox x:Name="DialogsListView" 
+                             SelectionChanged="DialogsListView_SelectionChanged"
+                             Background="Transparent" 
+                             BorderThickness="0"
+                             Height="300">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Margin="5">
+                                    <TextBlock Text="🟢" Margin="0,0,8,0" Foreground="LightGreen"/>
+                                    <TextBlock Text="{Binding}" Foreground="White"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <Separator Margin="5" Background="{StaticResource BorderDark}"/>
+
+                    
+                </StackPanel>
+            </Border>
 
             <!-- Правая область: чат -->
             <Grid Grid.Column="1" Margin="10">
@@ -57,11 +97,20 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Border Margin="0,2" Padding="8" CornerRadius="8"
-                                        Background="{Binding IsOwn, Converter={StaticResource OwnMessageBackgroundConverter}}"
                                         HorizontalAlignment="{Binding IsOwn, Converter={StaticResource MessageAlignmentConverter}}">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="#3E3E42"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsOwn}" Value="True">
+                                                    <Setter Property="Background" Value="#2C7BE5"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
                                     <StackPanel>
-                                        <TextBlock Text="{Binding Author}" FontWeight="Bold" FontSize="11" Foreground="#AAAAAA"/>
-                                        <TextBlock Text="{Binding Text}" TextWrapping="Wrap" Foreground="White"/>
+                                        <TextBlock Text="{Binding Author}" FontWeight="Bold" FontSize="11" Foreground="#CCCCCC"/>
+                                        <TextBlock Text="{Binding Text}" TextWrapping="Wrap" Foreground="White" Margin="0,2,0,2"/>
                                         <TextBlock Text="{Binding Timestamp, StringFormat={}{0:HH:mm:ss}}" FontSize="10" Foreground="#888" HorizontalAlignment="Right"/>
                                     </StackPanel>
                                 </Border>
@@ -83,3 +132,31 @@
         </Grid>
     </ui:NavigationView>
 </Window>
+
+
+
+
+
+<!--<TextBlock Text="Запросы на файлы" FontWeight="Bold" Margin="10,5,0,5" Foreground="White"/>
+<ListBox x:Name="RequestsListBox" 
+         Height="120" 
+         Margin="5"
+         Background="Transparent"
+         BorderThickness="0"
+         SelectionChanged="RequestsListBox_SelectionChanged">
+    <ListBox.ItemTemplate>
+        <DataTemplate>
+            <StackPanel Orientation="Horizontal" Margin="2">
+                <TextBlock Text="{Binding FileName}" Foreground="White" Width="120" Margin="0,0,10,0"/>
+                <TextBlock Text="{Binding SenderNick}" Foreground="LightGray" FontSize="11"/>
+            </StackPanel>
+        </DataTemplate>
+    </ListBox.ItemTemplate>
+</ListBox>
+
+<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5">
+    <Button x:Name="ApproveRequestButton" Content="Разрешить" Width="80" Margin="0,0,10,0" 
+            IsEnabled="False" Click="ApproveRequest_Click"/>
+    <Button x:Name="RejectRequestButton" Content="Отклонить" Width="80" 
+            IsEnabled="False" Click="RejectRequest_Click"/>
+</StackPanel>-->

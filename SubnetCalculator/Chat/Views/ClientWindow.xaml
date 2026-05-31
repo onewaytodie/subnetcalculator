@@ -144,11 +144,15 @@
             <!-- Панель ввода -->
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBox x:Name="txtMessage" IsEnabled="False"/>
-                <Button x:Name="btnSend" Grid.Column="1" Content="Отправить" Width="80" Margin="10,0,0,0" IsEnabled="False" Click="SendButton_Click"/>
+                <Button x:Name="btnSendFile" Grid.Column="0" Content="📎" Width="40" Margin="0,0,5,0" 
+                        Click="SendFileButton_Click" IsEnabled="False"/>
+                <TextBox x:Name="txtMessage" Grid.Column="1" IsEnabled="False"/>
+                <Button x:Name="btnSend" Grid.Column="2" Content="Отправить" Width="80" Margin="5,0,0,0" 
+                        IsEnabled="False" Click="SendButton_Click"/>
             </Grid>
         </Grid>
     </Grid>
