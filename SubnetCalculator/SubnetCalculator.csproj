@@ -59,12 +59,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Chat\Models\ChatMessage.cs" />
+    <Compile Include="Chat\Models\FileTransferRequest.cs" />
     <Compile Include="Chat\Services\ChatServer.cs" />
-    <Compile Include="Chat\Services\ClientManager.cs" />
-    <Compile Include="Chat\Services\DialogManager.cs" />
-    <Compile Include="Chat\Services\MessageRouter.cs" />
-    <Compile Include="Chat\Services\UserManager.cs" />
-    <Compile Include="Chat\ViewModels\ClientWindowViewModel.cs" />
     <Compile Include="Chat\ViewModels\MessageAlignmentConverter.cs" />
     <Compile Include="Chat\Views\ChatWindow.xaml.cs">
       <DependentUpon>ChatWindow.xaml</DependentUpon>

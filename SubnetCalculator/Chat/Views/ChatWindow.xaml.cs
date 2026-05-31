@@ -10,10 +10,10 @@ namespace SubnetCalculator.Chat.Views
 {
 	public partial class ChatWindow : Window, INotifyPropertyChanged
 	{
-		private ChatServer _server;
-		private string _selectedDialogKey;
-		private ObservableCollection<ChatMessage> _currentMessages = new ObservableCollection<ChatMessage>();
-		private ObservableCollection<string> _dialogsList = new ObservableCollection<string>();
+		private ChatServer server;
+		private string selectedDialogKey;
+		private ObservableCollection<ChatMessage> currentMessages = new ObservableCollection<ChatMessage>();
+		private ObservableCollection<string> dialogsList = new ObservableCollection<string>();
 
 		public event PropertyChangedEventHandler PropertyChanged;
 		protected void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
@@ -22,21 +22,21 @@ namespace SubnetCalculator.Chat.Views
 		{
 			InitializeComponent();
 			DataContext = this;
-			DialogsListView.ItemsSource = _dialogsList;
-			MessagesItemsControl.ItemsSource = _currentMessages;
+			DialogsListView.ItemsSource = dialogsList;
+			MessagesItemsControl.ItemsSource = currentMessages;
 			Loaded += ChatWindow_Loaded;
 		}
 
 		private async void ChatWindow_Loaded(object sender, RoutedEventArgs e)
 		{
-			_server = new ChatServer();
-			_server.OnLog += AppendLog;
-			_server.ClientConnected += OnClientConnected;
-			_server.ClientDisconnected += OnClientDisconnected;
-			_server.DialogMessageReceived += OnDialogMessageReceived;
-			_server.BroadcastMessageReceived += OnBroadcastMessageReceived;
+			server = new ChatServer();
+			server.OnLog += AppendLog;
+			server.ClientConnected += OnClientConnected;
+			server.ClientDisconnected += OnClientDisconnected;
+			server.DialogMessageReceived += OnDialogMessageReceived;
+			server.BroadcastMessageReceived += OnBroadcastMessageReceived;
 
-			await _server.StartAsync(27015);
+			await server.StartAsync(27015);
 			AppendLog("Сервер запущен.");
 		}
 
@@ -44,14 +44,14 @@ namespace SubnetCalculator.Chat.Views
 		{
 			Dispatcher.Invoke(() =>
 			{
-				_server.GetBroadcastMessages().Add(new ChatMessage
+				server.GetBroadcastMessages().Add(new ChatMessage
 				{
 					Author = "Система",
 					Text = $"Клиент {nick} подключился.",
 					Timestamp = DateTime.Now,
 					IsOwn = false
 				});
-				if (_selectedDialogKey == "Общий чат")
+				if (selectedDialogKey == "Общий чат")
 					RefreshMessages();
 				UpdateDialogsList();
 			});
@@ -61,14 +61,14 @@ namespace SubnetCalculator.Chat.Views
 		{
 			Dispatcher.Invoke(() =>
 			{
-				_server.GetBroadcastMessages().Add(new ChatMessage
+				server.GetBroadcastMessages().Add(new ChatMessage
 				{
 					Author = "Система",
 					Text = $"Клиент {nick} отключился.",
 					Timestamp = DateTime.Now,
 					IsOwn = false
 				});
-				if (_selectedDialogKey == "Общий чат")
+				if (selectedDialogKey == "Общий чат")
 					RefreshMessages();
 				UpdateDialogsList();
 			});
@@ -78,8 +78,8 @@ namespace SubnetCalculator.Chat.Views
 		{
 			Dispatcher.Invoke(() =>
 			{
-				if (_selectedDialogKey == dialogKey)
-					_currentMessages.Add(message);
+				if (selectedDialogKey == dialogKey)
+					currentMessages.Add(message);
 				UpdateDialogsList();
 			});
 		}
@@ -88,8 +88,8 @@ namespace SubnetCalculator.Chat.Views
 		{
 			Dispatcher.Invoke(() =>
 			{
-				if (_selectedDialogKey == "Общий чат")
-					_currentMessages.Add(message);
+				if (selectedDialogKey == "Общий чат")
+					currentMessages.Add(message);
 			});
 		}
 
@@ -97,11 +97,11 @@ namespace SubnetCalculator.Chat.Views
 		{
 			Dispatcher.Invoke(() =>
 			{
-				var dialogs = _server.GetAllDialogs().ToList();
-				_dialogsList.Clear();
-				_dialogsList.Add("Общий чат");
-				foreach (var d in dialogs.OrderBy(x => x))
-					_dialogsList.Add(d);
+				string[] dialogs = server.GetAllDialogs().ToArray();
+				dialogsList.Clear();
+				dialogsList.Add("Общий чат");
+				foreach (string dialog in dialogs.OrderBy(x => x))
+					dialogsList.Add(dialog);
 			});
 		}
 
@@ -109,7 +109,7 @@ namespace SubnetCalculator.Chat.Views
 		{
 			if (DialogsListView.SelectedItem is string selected)
 			{
-				_selectedDialogKey = selected;
+				selectedDialogKey = selected;
 				RefreshMessages();
 				MessageTextBox.IsEnabled = true;
 				SendButton.IsEnabled = true;
@@ -123,21 +123,21 @@ namespace SubnetCalculator.Chat.Views
 
 		private void RefreshMessages()
 		{
-			_currentMessages.Clear();
-			if (_selectedDialogKey == "Общий чат")
+			currentMessages.Clear();
+			if (selectedDialogKey == "Общий чат")
 			{
-				foreach (var msg in _server.GetBroadcastMessages())
-					_currentMessages.Add(msg);
+				foreach (ChatMessage msg in server.GetBroadcastMessages())
+					currentMessages.Add(msg);
 			}
 			else
 			{
-				var parts = _selectedDialogKey.Split('|');
+				string[] parts = selectedDialogKey.Split('|');
 				if (parts.Length == 2)
 				{
-					var messages = _server.GetDialogMessages(parts[0], parts[1]);
+					ObservableCollection<ChatMessage> messages = server.GetDialogMessages(parts[0], parts[1]);
 					if (messages != null)
-						foreach (var msg in messages)
-							_currentMessages.Add(msg);
+						foreach (ChatMessage msg in messages)
+							currentMessages.Add(msg);
 				}
 			}
 			ScrollToBottom();
@@ -145,20 +145,20 @@ namespace SubnetCalculator.Chat.Views
 
 		private async void SendButton_Click(object sender, RoutedEventArgs e)
 		{
-			if (string.IsNullOrWhiteSpace(MessageTextBox.Text) || _selectedDialogKey == null)
+			if (string.IsNullOrWhiteSpace(MessageTextBox.Text) || selectedDialogKey == null)
 				return;
 			string text = MessageTextBox.Text.Trim();
 
-			if (_selectedDialogKey == "Общий чат")
+			if (selectedDialogKey == "Общий чат")
 			{
-				await _server.SendAdminMessageToAll($"[Админ] {text}");
+				await server.SendAdminMessageToAll($"[Админ] {text}");
 			}
 			else
 			{
-				var parts = _selectedDialogKey.Split('|');
+				string[] parts = selectedDialogKey.Split('|');
 				if (parts.Length == 2)
 				{
-					await _server.SendAdminMessageToDialog(parts[0], parts[1], text);
+					await server.SendAdminMessageToDialog(parts[0], parts[1], text);
 				}
 			}
 			MessageTextBox.Clear();
@@ -177,7 +177,7 @@ namespace SubnetCalculator.Chat.Views
 
 		protected override void OnClosing(CancelEventArgs e)
 		{
-			_server?.Stop();
+			server?.Stop();
 			base.OnClosing(e);
 		}
 	}

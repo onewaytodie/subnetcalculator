@@ -14,16 +14,16 @@ namespace SubnetCalculator.Chat.Services
 {
 	public class ChatServer : IDisposable
 	{
-		private TcpListener _listener;
-		private bool _isRunning;
-		private readonly ConcurrentDictionary<TcpClient, string> _clientNick = new ConcurrentDictionary<TcpClient, string>();
-		private readonly ConcurrentDictionary<string, TcpClient> _nickToClient = new ConcurrentDictionary<string, TcpClient>();
-		private readonly object _fileLock = new object();
-		private readonly string _logFilePath;
+		private TcpListener listener;
+		private bool isRunning;
+		private readonly ConcurrentDictionary<TcpClient, string> clientNick = new ConcurrentDictionary<TcpClient, string>();
+		private readonly ConcurrentDictionary<string, TcpClient> nickToClient = new ConcurrentDictionary<string, TcpClient>();
+		private readonly object fileLock = new object();
+		private readonly string logFilePath;
 
 		public ObservableCollection<string> ConnectedClients { get; private set; } = new ObservableCollection<string>();
-		private readonly ConcurrentDictionary<string, ObservableCollection<ChatMessage>> _dialogs = new ConcurrentDictionary<string, ObservableCollection<ChatMessage>>();
-		private ObservableCollection<ChatMessage> _broadcastMessages = new ObservableCollection<ChatMessage>();
+		private readonly ConcurrentDictionary<string, ObservableCollection<ChatMessage>> dialogs = new ConcurrentDictionary<string, ObservableCollection<ChatMessage>>();
+		private ObservableCollection<ChatMessage> broadcastMessages = new ObservableCollection<ChatMessage>();
 
 		public event Action<string> ClientConnected;
 		public event Action<string> ClientDisconnected;
@@ -35,17 +35,17 @@ namespace SubnetCalculator.Chat.Services
 
 		public ChatServer(string logFilePath = "chat_log.txt")
 		{
-			_logFilePath = logFilePath;
+			this.logFilePath = logFilePath;
 		}
 
 		public async Task StartAsync(int port)
 		{
-			if (_isRunning) return;
+			if (isRunning) return;
 			try
 			{
-				_listener = new TcpListener(IPAddress.Any, port);
-				_listener.Start();
-				_isRunning = true;
+				listener = new TcpListener(IPAddress.Any, port);
+				listener.Start();
+				isRunning = true;
 				Log($"Сервер запущен на порту {port}");
 				await AcceptClientsAsync();
 			}
@@ -58,25 +58,25 @@ namespace SubnetCalculator.Chat.Services
 
 		public void Stop()
 		{
-			_isRunning = false;
-			_listener?.Stop();
-			foreach (var client in _clientNick.Keys)
+			isRunning = false;
+			listener?.Stop();
+			foreach (TcpClient client in clientNick.Keys)
 				client.Close();
-			_clientNick.Clear();
-			_nickToClient.Clear();
+			clientNick.Clear();
+			nickToClient.Clear();
 			ConnectedClients.Clear();
-			_dialogs.Clear();
-			_broadcastMessages.Clear();
+			dialogs.Clear();
+			broadcastMessages.Clear();
 			Log("Сервер остановлен.");
 		}
 
 		private async Task AcceptClientsAsync()
 		{
-			while (_isRunning)
+			while (isRunning)
 			{
 				try
 				{
-					TcpClient client = await _listener.AcceptTcpClientAsync();
+					TcpClient client = await listener.AcceptTcpClientAsync();
 					_ = Task.Run(() => HandleClientAsync(client));
 				}
 				catch (ObjectDisposedException) { break; }
@@ -111,25 +111,25 @@ namespace SubnetCalculator.Chat.Services
 				return;
 			}
 
-			if (_nickToClient.Count >= 10)
+			if (nickToClient.Count >= 10)
 			{
 				await SendErrorMessage(client, "Достигнуто максимальное количество клиентов (10).");
 				client.Close();
 				return;
 			}
 
-			if (_nickToClient.ContainsKey(requestedNick))
+			if (nickToClient.ContainsKey(requestedNick))
 			{
 				await SendErrorMessage(client, $"Ник '{requestedNick}' уже занят.");
 				client.Close();
 				return;
 			}
 
-			_clientNick[client] = requestedNick;
-			_nickToClient[requestedNick] = client;
+			clientNick[client] = requestedNick;
+			nickToClient[requestedNick] = client;
 
 			string adminDialogKey = GetDialogKey("Админ", requestedNick);
-			_dialogs.GetOrAdd(adminDialogKey, new ObservableCollection<ChatMessage>());
+			dialogs.GetOrAdd(adminDialogKey, new ObservableCollection<ChatMessage>());
 
 			Application.Current.Dispatcher.Invoke(() => ConnectedClients.Add(requestedNick));
 			Log($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} Клиент {requestedNick} ({endpoint}) подключился.");
@@ -153,7 +153,7 @@ namespace SubnetCalculator.Chat.Services
 
 					if (msg.StartsWith("/msg "))
 					{
-						var parts = msg.Substring(5).Split(new[] { ' ' }, 2);
+						string[] parts = msg.Substring(5).Split(new[] { ' ' }, 2);
 						if (parts.Length == 2)
 						{
 							string recipient = parts[0];
@@ -187,8 +187,8 @@ namespace SubnetCalculator.Chat.Services
 			}
 			finally
 			{
-				_clientNick.TryRemove(client, out _);
-				_nickToClient.TryRemove(requestedNick, out _);
+				clientNick.TryRemove(client, out _);
+				nickToClient.TryRemove(requestedNick, out _);
 				Application.Current.Dispatcher.Invoke(() => ConnectedClients.Remove(requestedNick));
 				ClientDisconnected?.Invoke(requestedNick);
 				Log($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} Клиент {requestedNick} отключился.");
@@ -199,7 +199,7 @@ namespace SubnetCalculator.Chat.Services
 
 		private async Task SendUserListToClient(TcpClient client, string selfNick)
 		{
-			var list = string.Join(",", _nickToClient.Keys.Where(n => n != selfNick));
+			string list = string.Join(",", nickToClient.Keys.Where(n => n != selfNick));
 			string userListMsg = $"/users {list}";
 			byte[] data = Encoding.UTF8.GetBytes(userListMsg);
 			await client.GetStream().WriteAsync(data, 0, data.Length);
@@ -207,10 +207,10 @@ namespace SubnetCalculator.Chat.Services
 
 		private async Task BroadcastUserList(TcpClient excludeClient)
 		{
-			var list = string.Join(",", _nickToClient.Keys);
+			string list = string.Join(",", nickToClient.Keys);
 			string userListMsg = $"/users {list}";
 			byte[] data = Encoding.UTF8.GetBytes(userListMsg);
-			foreach (var client in _nickToClient.Values)
+			foreach (TcpClient client in nickToClient.Values)
 			{
 				if (excludeClient != null && client == excludeClient) continue;
 				try
@@ -230,16 +230,16 @@ namespace SubnetCalculator.Chat.Services
 
 		private string GetDialogKey(string nick1, string nick2)
 		{
-			var sorted = new[] { nick1, nick2 }.OrderBy(x => x).ToArray();
+			string[] sorted = new[] { nick1, nick2 }.OrderBy(x => x).ToArray();
 			return $"{sorted[0]}|{sorted[1]}";
 		}
 
 		private async Task SendPrivateMessage(string senderNick, string recipientNick, string message, string time)
 		{
-			if (!_nickToClient.ContainsKey(recipientNick))
+			if (!nickToClient.ContainsKey(recipientNick))
 			{
 				string errorMsg = $"[{time}] Пользователь {recipientNick} не найден.";
-				if (_nickToClient.TryGetValue(senderNick, out var senderClient))
+				if (nickToClient.TryGetValue(senderNick, out TcpClient senderClient))
 				{
 					byte[] data = Encoding.UTF8.GetBytes(errorMsg);
 					await senderClient.GetStream().WriteAsync(data, 0, data.Length);
@@ -248,9 +248,9 @@ namespace SubnetCalculator.Chat.Services
 			}
 
 			string dialogKey = GetDialogKey(senderNick, recipientNick);
-			var dialogMessages = _dialogs.GetOrAdd(dialogKey, new ObservableCollection<ChatMessage>());
+			ObservableCollection<ChatMessage> dialogMessages = dialogs.GetOrAdd(dialogKey, new ObservableCollection<ChatMessage>());
 
-			var chatMsg = new ChatMessage
+			ChatMessage chatMsg = new ChatMessage
 			{
 				Author = senderNick,
 				Text = message,
@@ -262,26 +262,26 @@ namespace SubnetCalculator.Chat.Services
 
 			string formatted = $"[{time}] {senderNick}: {message}";
 			byte[] dataToRecipient = Encoding.UTF8.GetBytes(formatted);
-			var recipientClient = _nickToClient[recipientNick];
+			TcpClient recipientClient = nickToClient[recipientNick];
 			await recipientClient.GetStream().WriteAsync(dataToRecipient, 0, dataToRecipient.Length);
 		}
 
 		private async Task BroadcastAsync(string formattedMessage, string senderNick)
 		{
-			var broadcastMsg = new ChatMessage
+			ChatMessage broadcastMsg = new ChatMessage
 			{
 				Author = senderNick,
 				Text = formattedMessage,
 				Timestamp = DateTime.Now,
 				IsOwn = false
 			};
-			Application.Current.Dispatcher.Invoke(() => _broadcastMessages.Add(broadcastMsg));
+			Application.Current.Dispatcher.Invoke(() => broadcastMessages.Add(broadcastMsg));
 			BroadcastMessageReceived?.Invoke(broadcastMsg);
 
 			byte[] data = Encoding.UTF8.GetBytes(formattedMessage);
-			foreach (var client in _nickToClient.Values)
+			foreach (TcpClient client in nickToClient.Values)
 			{
-				if (_clientNick[client] == senderNick) continue;
+				if (clientNick[client] == senderNick) continue;
 				try
 				{
 					if (client.Connected)
@@ -294,8 +294,8 @@ namespace SubnetCalculator.Chat.Services
 		public async Task SendAdminMessageToDialog(string nick1, string nick2, string message)
 		{
 			string dialogKey = GetDialogKey(nick1, nick2);
-			var dialogMessages = _dialogs.GetOrAdd(dialogKey, new ObservableCollection<ChatMessage>());
-			var adminMsg = new ChatMessage
+			ObservableCollection<ChatMessage> dialogMessages = dialogs.GetOrAdd(dialogKey, new ObservableCollection<ChatMessage>());
+			ChatMessage adminMsg = new ChatMessage
 			{
 				Author = "Админ",
 				Text = message,
@@ -307,26 +307,26 @@ namespace SubnetCalculator.Chat.Services
 
 			string formatted = $"[{DateTime.Now:HH:mm:ss}] Админ: {message}";
 			byte[] data = Encoding.UTF8.GetBytes(formatted);
-			if (_nickToClient.TryGetValue(nick1, out var client1))
+			if (nickToClient.TryGetValue(nick1, out TcpClient client1))
 				await client1.GetStream().WriteAsync(data, 0, data.Length);
-			if (_nickToClient.TryGetValue(nick2, out var client2))
+			if (nickToClient.TryGetValue(nick2, out TcpClient client2))
 				await client2.GetStream().WriteAsync(data, 0, data.Length);
 		}
 
 		public async Task SendAdminMessageToAll(string message)
 		{
-			var adminMsg = new ChatMessage
+			ChatMessage adminMsg = new ChatMessage
 			{
 				Author = "Админ",
 				Text = message,
 				Timestamp = DateTime.Now,
 				IsOwn = true
 			};
-			Application.Current.Dispatcher.Invoke(() => _broadcastMessages.Add(adminMsg));
+			Application.Current.Dispatcher.Invoke(() => broadcastMessages.Add(adminMsg));
 			BroadcastMessageReceived?.Invoke(adminMsg);
 
 			byte[] data = Encoding.UTF8.GetBytes(message);
-			foreach (var client in _nickToClient.Values)
+			foreach (TcpClient client in nickToClient.Values)
 			{
 				try
 				{
@@ -340,17 +340,17 @@ namespace SubnetCalculator.Chat.Services
 		public ObservableCollection<ChatMessage> GetDialogMessages(string nick1, string nick2)
 		{
 			string key = GetDialogKey(nick1, nick2);
-			return _dialogs.TryGetValue(key, out var messages) ? messages : null;
+			return dialogs.TryGetValue(key, out ObservableCollection<ChatMessage> messages) ? messages : null;
 		}
 
-		public ObservableCollection<ChatMessage> GetBroadcastMessages() => _broadcastMessages;
+		public ObservableCollection<ChatMessage> GetBroadcastMessages() => broadcastMessages;
 
-		public System.Collections.Generic.IEnumerable<string> GetAllDialogs() => _dialogs.Keys;
+		public System.Collections.Generic.IEnumerable<string> GetAllDialogs() => dialogs.Keys;
 
 		private void Log(string text)
 		{
 			OnLog?.Invoke(text);
-			lock (_fileLock) { File.AppendAllText(_logFilePath, text + Environment.NewLine); }
+			lock (fileLock) { File.AppendAllText(logFilePath, text + Environment.NewLine); }
 		}
 
 		public void Dispose()

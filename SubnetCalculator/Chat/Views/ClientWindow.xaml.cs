@@ -10,19 +10,19 @@ namespace SubnetCalculator.Chat.Views
 {
 	public partial class ClientWindow : Window
 	{
-		private TcpClient _client;
-		private NetworkStream _stream;
-		private bool _isConnected;
-		private string _selectedUser;
-		private string _myNick;
-		private ObservableCollection<ChatMessage> _messages = new ObservableCollection<ChatMessage>();
-		private ObservableCollection<string> _users = new ObservableCollection<string>();
+		private TcpClient client;
+		private NetworkStream stream;
+		private bool isConnected;
+		private string selectedUser;
+		private string myNick;
+		private ObservableCollection<ChatMessage> messages = new ObservableCollection<ChatMessage>();
+		private ObservableCollection<string> users = new ObservableCollection<string>();
 
 		public ClientWindow()
 		{
 			InitializeComponent();
-			UsersListBox.ItemsSource = _users;
-			MessagesItemsControl.ItemsSource = _messages;
+			UsersListBox.ItemsSource = users;
+			MessagesItemsControl.ItemsSource = messages;
 		}
 
 		private async void BtnConnect_Click(object sender, RoutedEventArgs e)
@@ -35,26 +35,26 @@ namespace SubnetCalculator.Chat.Views
 
 			try
 			{
-				_client = new TcpClient();
-				await _client.ConnectAsync(txtServerIP.Text, port);
-				_stream = _client.GetStream();
+				client = new TcpClient();
+				await client.ConnectAsync(txtServerIP.Text, port);
+				stream = client.GetStream();
 
-				_myNick = txtNick.Text.Trim();
-				if (string.IsNullOrEmpty(_myNick)) _myNick = "User";
-				byte[] nickData = Encoding.UTF8.GetBytes($"/nick {_myNick}");
-				await _stream.WriteAsync(nickData, 0, nickData.Length);
+				myNick = txtNick.Text.Trim();
+				if (string.IsNullOrEmpty(myNick)) myNick = "User";
+				byte[] nickData = Encoding.UTF8.GetBytes($"/nick {myNick}");
+				await stream.WriteAsync(nickData, 0, nickData.Length);
 
 				byte[] buffer = new byte[4096];
-				int bytes = await _stream.ReadAsync(buffer, 0, buffer.Length);
+				int bytes = await stream.ReadAsync(buffer, 0, buffer.Length);
 				string response = Encoding.UTF8.GetString(buffer, 0, bytes);
 				if (response != "/nick ok")
 				{
 					MessageBox.Show($"Ошибка регистрации: {response}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-					_client.Close();
+					client.Close();
 					return;
 				}
 
-				_isConnected = true;
+				isConnected = true;
 				AddSystemMessage("Подключено к серверу.");
 				btnConnect.IsEnabled = false;
 				btnDisconnect.IsEnabled = true;
@@ -73,22 +73,22 @@ namespace SubnetCalculator.Chat.Views
 			byte[] buffer = new byte[4096];
 			try
 			{
-				while (_isConnected)
+				while (isConnected)
 				{
-					int bytes = await _stream.ReadAsync(buffer, 0, buffer.Length);
+					int bytes = await stream.ReadAsync(buffer, 0, buffer.Length);
 					if (bytes == 0) break;
 					string msg = Encoding.UTF8.GetString(buffer, 0, bytes);
 
 					if (msg.StartsWith("/users "))
 					{
 						string usersData = msg.Substring(7);
-						var users = usersData.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+						string[] usersArray = usersData.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 						Dispatcher.Invoke(() =>
 						{
-							_users.Clear();
-							_users.Add("Общий чат");
-							foreach (var u in users)
-								if (u != _myNick) _users.Add(u);
+							users.Clear();
+							users.Add("Общий чат");
+							foreach (string u in usersArray)
+								if (u != myNick) users.Add(u);
 						});
 						continue;
 					}
@@ -114,22 +114,22 @@ namespace SubnetCalculator.Chat.Views
 
 		private void SendButton_Click(object sender, RoutedEventArgs e)
 		{
-			if (!_isConnected) return;
+			if (!isConnected) return;
 			string msg = txtMessage.Text.Trim();
 			if (string.IsNullOrEmpty(msg)) return;
 
-			if (_selectedUser == null || _selectedUser == "Общий чат")
+			if (selectedUser == null || selectedUser == "Общий чат")
 			{
 				string command = $"/all {msg}";
 				byte[] data = Encoding.UTF8.GetBytes(command);
-				_stream.Write(data, 0, data.Length);
+				stream.Write(data, 0, data.Length);
 				AddMessage(new ChatMessage { Author = "Я", Text = msg, Timestamp = DateTime.Now, IsOwn = true });
 			}
 			else
 			{
-				string command = $"/msg {_selectedUser} {msg}";
+				string command = $"/msg {selectedUser} {msg}";
 				byte[] data = Encoding.UTF8.GetBytes(command);
-				_stream.Write(data, 0, data.Length);
+				stream.Write(data, 0, data.Length);
 				AddMessage(new ChatMessage { Author = "Я", Text = msg, Timestamp = DateTime.Now, IsOwn = true });
 			}
 			txtMessage.Clear();
@@ -139,7 +139,7 @@ namespace SubnetCalculator.Chat.Views
 		{
 			if (UsersListBox.SelectedItem is string user)
 			{
-				_selectedUser = user;
+				selectedUser = user;
 				ChatTitle.Text = user == "Общий чат" ? "Общий чат" : $"Чат с {user}";
 			}
 		}
@@ -148,7 +148,7 @@ namespace SubnetCalculator.Chat.Views
 		{
 			Dispatcher.Invoke(() =>
 			{
-				_messages.Add(msg);
+				messages.Add(msg);
 				MessagesScrollViewer.ScrollToEnd();
 			});
 		}
@@ -160,11 +160,11 @@ namespace SubnetCalculator.Chat.Views
 
 		private void Disconnect()
 		{
-			if (_isConnected)
+			if (isConnected)
 			{
-				_isConnected = false;
-				_stream?.Close();
-				_client?.Close();
+				isConnected = false;
+				stream?.Close();
+				client?.Close();
 				AddSystemMessage("Отключено от сервера.");
 			}
 			btnConnect.IsEnabled = true;
