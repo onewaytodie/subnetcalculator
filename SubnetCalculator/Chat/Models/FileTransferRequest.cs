@@ -4,17 +4,31 @@ namespace SubnetCalculator.Chat.Models
 {
 	public class FileTransferRequest
 	{
+		// Имя (ник) отправителя файла
 		public string SenderNick { get; set; }
-		public string RecipientNick { get; set; }
-		public string FileName { get; set; }
-		public long FileSize { get; set; }
-		public DateTime Timestamp { get; set; }
-		public string RequestId { get; set; } // уникальный идентификатор запроса
 
+		// Имя (ник) получателя файла
+		public string RecipientNick { get; set; }
+
+		// Имя файла (без пути)
+		public string FileName { get; set; }
+
+		// Размер файла в байтах (long – для больших файлов)
+		public long FileSize { get; set; }
+
+		// Время создания запроса (когда клиент отправил /file_request)
+		public DateTime Timestamp { get; set; }
+
+		// Уникальный идентификатор запроса (генерируется автоматически)
+		public string RequestId { get; set; }
+
+		// Конструктор – инициализирует новый запрос:
+		// - создаёт уникальный Guid в виде строки
+		// - устанавливает текущее время
 		public FileTransferRequest()
 		{
-			RequestId = Guid.NewGuid().ToString();
-			Timestamp = DateTime.Now;
+			RequestId = Guid.NewGuid().ToString(); // глобально уникальный идентификатор
+			Timestamp = DateTime.Now;              // текущее время на сервере (или на клиенте)
 		}
 	}
 }
