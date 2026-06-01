@@ -3,10 +3,10 @@ using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
+using System.Net;				//https://learn.microsoft.com/ru-ru/dotnet/api/system.net?view=net-8.0
+using System.Net.Sockets;		//https://learn.microsoft.com/ru-ru/dotnet/fundamentals/networking/sockets/socket-services
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading.Tasks;   //https://learn.microsoft.com/ru-ru/dotnet/fundamentals/runtime-libraries/system-threading-tasks-task
 using System.Windows;
 using SubnetCalculator.Chat.Models;
 

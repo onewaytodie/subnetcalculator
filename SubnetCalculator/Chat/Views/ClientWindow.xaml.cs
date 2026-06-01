@@ -194,7 +194,7 @@ namespace SubnetCalculator.Chat.Views
 
 		private async void SendFileButton_Click(object sender, RoutedEventArgs e)
 		{
-			AddSystemMessage("Отправка файлов временно отключена.");
+			AddSystemMessage("Отправка файлов отключена.");
 			return;
 		}
 
